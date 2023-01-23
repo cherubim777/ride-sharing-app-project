@@ -1,3 +1,3 @@
 # ride-sharing-app-project
 
-This project is a ride sharing mobile application in flutter.
+A Flutter project to create a mobile app that provides users with a dependable and simple way to share rides and split ride costs.
