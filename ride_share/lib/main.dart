@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:ride_share/main_page.dart';
 
 void main() {
-  runApp(const MaterialApp());
+  runApp(const MaterialApp(
+    home: MainPage(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
