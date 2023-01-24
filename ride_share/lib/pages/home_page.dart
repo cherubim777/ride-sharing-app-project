@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 
+import '../main_page.dart';
+
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
@@ -15,9 +17,9 @@ class HomePage extends StatelessWidget {
     return const Text('እንኩዋን በደህና መጡ፣ አሁን ታክሲ የመጋራት ግልጋሎትዎን ይጀምሩ');
   }
 
-  Widget _userId() {
-    return Text(user?.email ?? 'user email');
-  }
+  // Widget _userId() {
+  //   return Text(user?.email ?? 'user email');
+  // }
 
   Widget _signOutButton() {
     return ElevatedButton(
@@ -32,15 +34,23 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: _title(),
       ),
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _userId(),
+            ElevatedButton(
+              onPressed: (() {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MainPage()),
+                );
+              }),
+              child: const Text("CREATE RIDE"),
+            ),
+            ElevatedButton(
+              onPressed: (() {}),
+              child: const Text("REQUEST TO JOIN RIDE"),
+            ),
             _signOutButton(),
           ],
         ),

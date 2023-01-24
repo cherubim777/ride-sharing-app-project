@@ -11,10 +11,36 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
-    return const GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: LatLng(12, 41),
-        zoom: 9,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Map'),
+      ),
+      body: Stack(
+        children: [
+          const GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: LatLng(12, 41),
+              zoom: 9,
+            ),
+          ),
+          Column(
+            children: const [
+              Padding(
+                padding: EdgeInsets.fromLTRB(50, 15, 50, 5),
+                child: TextField(
+                  decoration: InputDecoration(labelText: 'Starting Location'),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(50, 5, 50, 5),
+                child: TextField(
+                  decoration:
+                      InputDecoration(labelText: 'Destination Location'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
