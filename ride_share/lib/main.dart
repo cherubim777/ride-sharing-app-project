@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ride_share/login_page.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: LoginPage(),
-  ));
+  runApp(const MaterialApp());
 }
 
 class MyApp extends StatelessWidget {
