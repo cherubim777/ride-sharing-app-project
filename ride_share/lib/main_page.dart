@@ -1,25 +1,59 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  MainPage({super.key});
+
+  final Completer<GoogleMapController> _controller = Completer();
+  double lat = 100;
+  double lng = -40;
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
+  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController? controller;
+
+  Future<Position> getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Error');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Location Denied Permanently');
+    }
+    return await Geolocator.getCurrentPosition();
+  }
+
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      getCurrentLocation().then((value) {
+        widget.lat = value.latitude;
+        widget.lng = value.longitude;
+        print(widget.lat);
+        print(widget.lng);
+      });
+    });
     return Scaffold(
       appBar: AppBar(
         title: const Text('Map'),
       ),
       body: Stack(
         children: [
-          const GoogleMap(
+          GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: LatLng(12, 41),
+              target: LatLng(widget.lat, widget.lat),
               zoom: 9,
             ),
           ),
@@ -41,6 +75,17 @@ class _MainPageState extends State<MainPage> {
             ],
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            getCurrentLocation().then((value) {
+              widget.lat = value.latitude;
+              widget.lng = value.longitude;
+            });
+          });
+        },
+        child: const Icon(Icons.my_location_outlined),
       ),
     );
   }
