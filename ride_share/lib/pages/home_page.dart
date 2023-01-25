@@ -46,6 +46,20 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  final TextEditingController _controllerLocation = TextEditingController();
+  Widget _changeEntryField(String title, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+      ),
+    );
+  }
+
+  _updateDatabaseField() {
+    userProfileData.updateUserData(_controllerLocation.text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final userProfile = database.ref().child('UserProfile');
@@ -58,6 +72,11 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            _changeEntryField('new location', _controllerLocation),
+            ElevatedButton(
+              onPressed: _updateDatabaseField,
+              child: const Text('update'),
+            ),
             ElevatedButton(
                 onPressed: () async {
                   try {

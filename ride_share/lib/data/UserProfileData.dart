@@ -29,7 +29,7 @@ class UserProfileData {
     return _profile;
   }
 
-  void appendIntoDatabase(DataModel dataModel) async {
+  void appendIntoDatabase(dataModel) async {
     // DatabaseReference _newUserProfile = database.ref('UserProfile');
     // _newUserProfile.push().set(dataModel.toJson());
     DatabaseReference _newUserProfile = database.ref();
@@ -39,6 +39,18 @@ class UserProfileData {
           .child('UserProfile')
           .child(user.uid)
           .set(dataModel.toJson());
+    }
+  }
+
+  void updateUserData(String updatedData) async {
+    DatabaseReference _newUserProfile = database.ref();
+    final User? user = Auth().currentUser;
+    if (user != null) {
+      await _newUserProfile
+          .child('UserProfile')
+          .child(user.uid)
+          .child('location')
+          .update({'CurrentLocation': updatedData});
     }
   }
 }
