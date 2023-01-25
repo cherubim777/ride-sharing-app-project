@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
   final database = FirebaseDatabase.instance;
   var userProfileData = UserProfileData();
 
-  void _updateDatabase() {
+  void _registerIntoDatabase() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
@@ -24,9 +24,11 @@ class HomePage extends StatelessWidget {
         userProfileData.appendIntoDatabase(currentProfileData);
       }
     });
-    // widget.messageDao.saveMessage(message);
-    // _messageController.clear();
-    // setState(() {});
+  }
+
+  _readFromDatabase() {
+    var data = userProfileData.readData('EmailAddress');
+    return data.toString();
   }
 
   Future<void> signOut() async {
@@ -34,12 +36,8 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _title() {
-    return const Text('እንኩዋን በደህና መጡ፣ አሁን ታክሲ የመጋራት ግልጋሎትዎን ይጀምሩ');
+    return const Text('እንኩዋን በደህና መጡ፣ ታክሲ የመጋራት');
   }
-
-  // Widget _userId() {
-  //   return Text(user?.email ?? 'user email');
-  // }
 
   Widget _signOutButton() {
     return ElevatedButton(
@@ -47,13 +45,6 @@ class HomePage extends StatelessWidget {
       child: const Text('Sign Out'),
     );
   }
-
-  // Widget _saveProfile() {
-  //   return ElevatedButton(
-  //     onPressed: () {},
-  //     child: const Text('Save my profile'),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -67,33 +58,29 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            ElevatedButton(
+                onPressed: () async {
+                  try {
+                    Text(_readFromDatabase());
+                    print('User profile has been read from the database');
+                  } catch (error) {
+                    print('something went wrong\n\n $error');
+                  }
+                },
+                child: const Text('Read Data')),
             // _userId(),
-            _signOutButton(),
-            // _saveProfile(),
             ElevatedButton(
               onPressed: () async {
                 try {
-                  // await userProfile.set(
-                  //   {
-                  //     'UserName': 'arik',
-                  //     'UserType': 'agari',
-                  //     'PhoneNumber': '0987654321',
-                  //     'EmailAddress': 'arik@gmail.com',
-                  //     'UserStatus': 'online',
-                  //     'location': {
-                  //       'CurrentLocation': '4kilo',
-                  //       'DestinationLocation': 'Welete',
-                  //     }
-                  //   },
-                  // );
-                  _updateDatabase();
+                  _registerIntoDatabase();
                   print('User profile has been saved to the database');
                 } catch (error) {
-                  print('something went wrong $error');
+                  print('something went wrong\n\n $error');
                 }
               },
               child: const Text('save my Profile'),
             ),
+            _signOutButton(),
           ],
         ),
       ),
