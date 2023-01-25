@@ -1,58 +1,44 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:ride_share/data/dataModel.dart';
+
+import 'package:ride_share/auth.dart';
 
 FirebaseDatabase database = FirebaseDatabase.instance;
 
 class UserProfileData {
-  final DatabaseReference _userProfile =
-      FirebaseDatabase.instance.ref('UserProfile');
-  // reads data from real_time_database as they changes.
-  void readData(DataModel dataModel) {
-    _userProfile.onValue.listen((DatabaseEvent event) {
-      final _profile = event.snapshot.value;
-    });
-    // dataModel.fromJson(_profile);
+  // final DatabaseReference _userProfile =
+  //     FirebaseDatabase.instance.ref('UserProfile');
+
+  readData(String request) async {
+    var _profile;
+    final User? user = Auth().currentUser;
+    if (user != null) {
+      // var _userRequest = database.ref('UserProfile/${user.uid}/{$request');
+      var _userRequest =
+          database.ref().child('UserProfile').child(user.uid).child(request);
+      try {
+        await _userRequest.onValue.listen((DatabaseEvent event) {
+          _profile = event.snapshot.value;
+          print('reading from database ===>> $_profile');
+        });
+      } catch (e) {
+        print('unable to read data $e');
+      }
+    }
+    return _profile;
   }
 
   void appendIntoDatabase(DataModel dataModel) async {
-    DatabaseReference _newUserProfile = _userProfile;
-    _newUserProfile.push().set(dataModel.toJson());
-    // Query getDataModelQuery() {
-    //   return _userProfile;
-    // }
-
-    // void updateData() async {
-    //   try {
-    //     await dataModel.update(
-    //       {
-    //         'UserType': null,
-    //         'location': {
-    //           'CurrentLocation': 'Meskel square',
-    //           'DestinationLocation': 'Welete',
-    //         }
-    //       },
-    //     );
-    //   } catch (e) {
-    //     print('something went wrong with the update');
-    //   }
-    // }
-
-    // try {
-    //   await dataModel.set(
-    //     {
-    //       'UserName': 'arik',
-    //       'UserType': 'agari',
-    //       'PhoneNumber': '0987654321',
-    //       'EmailAddress': 'arik@gmail.com',
-    //       'UserStatus': 'online',
-    //       'location': {
-    //         'CurrentLocation': '4kilo',
-    //         'DestinationLocation': 'Welete',
-    //       }
-    //     },
-    //   );
-    // } catch (e) {
-    //   print("something went wrong");
-    // }
+    // DatabaseReference _newUserProfile = database.ref('UserProfile');
+    // _newUserProfile.push().set(dataModel.toJson());
+    DatabaseReference _newUserProfile = database.ref();
+    final User? user = Auth().currentUser;
+    if (user != null) {
+      _newUserProfile
+          .child('UserProfile')
+          .child(user.uid)
+          .set(dataModel.toJson());
+    }
   }
 }
