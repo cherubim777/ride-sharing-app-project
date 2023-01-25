@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/main.dart';
 import 'package:ride_share/auth.dart';
-import 'package:ride_share/main_page.dart';
+import 'package:ride_share/pages/landing_page.dart';
 import 'package:ride_share/pages/home_page.dart';
 import 'package:ride_share/pages/login_register_page.dart';
 
