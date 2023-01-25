@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
+import 'package:ride_share/data/UserProfileData.dart';
+// import 'package:ride_share/data/dataModel.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,6 +14,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   String? errorMessage = '';
   bool isLoggedIn = true;
+  var profileData = UserProfileData();
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -34,8 +37,6 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> createUserWithEmailAndPassword() async {
     try {
       await Auth().createWithEmailAndPassword(
-        phoneNumber: _controllerPhoneNumber.text,
-        name: _controllerName.text,
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
@@ -95,11 +96,13 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(50, 8, 50, 8),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              _entryField('name', _controllerName),
+              _entryField('phone number', _controllerPhoneNumber),
               _entryField('email', _controllerEmail),
               _entryField('password', _controllerPassword),
               _errorMessage(),
