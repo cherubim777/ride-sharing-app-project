@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 
-import '../main_page.dart';
+import 'package:ride_share/pages/landing_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
