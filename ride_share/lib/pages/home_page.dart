@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 import 'package:ride_share/data/dataModel.dart';
 import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/pages/landing_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -77,6 +78,16 @@ class HomePage extends StatelessWidget {
               onPressed: _updateDatabaseField,
               child: const Text('update'),
             ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MainPage(),
+                    ),
+                  );
+                },
+                child: const Text('Create Ride')),
             ElevatedButton(
                 onPressed: () async {
                   try {
