@@ -14,8 +14,8 @@ class DataModel {
         email = json['EmailAddress'] as String,
         userType = json['UserStatus'] as String,
         userStatus = json['UserStatus'] as String,
-        currentLocation = json['location[CurrentLocation]'] as String,
-        destinationLocation = json['location[DestinationLocation]'] as String;
+        currentLocation = json['CurrentLocation'] as String,
+        destinationLocation = json['DestinationLocation'] as String;
 
   Map<dynamic, dynamic> toJson() => <dynamic, dynamic>{
         'Uid': uid,
@@ -24,10 +24,8 @@ class DataModel {
         'EmailAddress': email,
         'UserType': userType,
         'UserStatus': userStatus,
-        'location': {
-          'CurrentLocation': currentLocation,
-          'DestinationLocation': destinationLocation
-        }
+        'CurrentLocation': currentLocation,
+        'DestinationLocation': destinationLocation
       };
 
   late String uid;
