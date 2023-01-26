@@ -1,13 +1,15 @@
 // import 'package:firebase_database/firebase_database.dart';
 
 class DataModel {
-  DataModel(this.uid, this.userName, this.phoneNumber, this.email,
+  DataModel(this.uid, this.email,
       {this.userStatus = 'online',
+      this.userName = 'name',
+      this.phoneNumber = 'phoneNumber',
       this.currentLocation = 'welete',
       this.destinationLocation = '4kilo',
       this.userType = 'agari'});
 
-  DataModel.fromJson(Map<dynamic, dynamic> json)
+  DataModel.fromJson(Map<String, dynamic> json)
       : uid = json['Uid'] as String,
         userName = json['UserName'] as String,
         phoneNumber = json['PhoneNumber'] as String,
