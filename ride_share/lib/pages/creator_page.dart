@@ -134,7 +134,6 @@ class _CreatorPageState extends State<CreatorPage> {
           OSMFlutter(
             controller: controller,
             showZoomController: true,
-            // androidHotReloadSupport: true,
             onLocationChanged: (p0) {
               currentLocation = p0;
             },
@@ -183,7 +182,6 @@ class _CreatorPageState extends State<CreatorPage> {
                 Autocomplete(
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
-                      // return const Iterable<String>.empty();
                       return ["Your Location"];
                     } else {
                       List<String> sug =
@@ -202,7 +200,7 @@ class _CreatorPageState extends State<CreatorPage> {
                       focusNode: focusNode,
                       onEditingComplete: onFieldSubmitted,
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.place),
+                          prefixIcon: const Icon(Icons.place),
                           suffix: IconButton(
                               onPressed: () async {
                                 controller.removeMarker(startingPoint);
@@ -219,14 +217,14 @@ class _CreatorPageState extends State<CreatorPage> {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.arrow_right_alt)),
+                              icon: const Icon(Icons.arrow_right_alt)),
                           filled: true,
-                          constraints: BoxConstraints(maxHeight: 60),
+                          constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          hintText: "Starting Location..."),
+                          hintText: "Starting Location"),
                     );
                   },
                 ),
@@ -237,7 +235,6 @@ class _CreatorPageState extends State<CreatorPage> {
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
                       return const Iterable<String>.empty();
-                      // return ["Your Location"];
                     } else {
                       List<String> sug =
                           await fetchSuggestions(textEditingValue.text);
@@ -254,7 +251,7 @@ class _CreatorPageState extends State<CreatorPage> {
                       focusNode: focusNode,
                       onEditingComplete: onFieldSubmitted,
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.local_taxi),
+                          prefixIcon: const Icon(Icons.local_taxi),
                           suffix: IconButton(
                               onPressed: () async {
                                 controller.removeMarker(destinationPoint);
@@ -272,14 +269,14 @@ class _CreatorPageState extends State<CreatorPage> {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.arrow_right_alt)),
+                              icon: const Icon(Icons.arrow_right_alt)),
                           filled: true,
-                          constraints: BoxConstraints(maxHeight: 60),
+                          constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          hintText: "Destination Location..."),
+                          hintText: "Destination Location"),
                     );
                   },
                 ),
@@ -295,8 +292,8 @@ class _CreatorPageState extends State<CreatorPage> {
             onPressed: () {
               controller.zoomIn();
             },
-            child: Icon(Icons.zoom_in),
             heroTag: null,
+            child: const Icon(Icons.zoom_in),
           ),
           const SizedBox(
             height: 10,
@@ -305,16 +302,16 @@ class _CreatorPageState extends State<CreatorPage> {
             onPressed: () {
               controller.zoomOut();
             },
-            child: Icon(Icons.zoom_out),
             heroTag: null,
+            child: const Icon(Icons.zoom_out),
           ),
           const SizedBox(
             height: 10,
           ),
           FloatingActionButton(
             onPressed: askAvailableSpace,
-            child: Icon(Icons.directions),
             heroTag: null,
+            child: const Icon(Icons.directions),
           ),
           const SizedBox(
             height: 10,
@@ -324,8 +321,8 @@ class _CreatorPageState extends State<CreatorPage> {
               await controller.currentLocation();
               controller.zoomIn();
             },
-            child: Icon(Icons.my_location),
             heroTag: null,
+            child: const Icon(Icons.my_location),
           ),
         ],
       ),

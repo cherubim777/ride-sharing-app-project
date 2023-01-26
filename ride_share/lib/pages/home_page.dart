@@ -42,10 +42,6 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _signOutButton() {
-    // return ElevatedButton(
-    //   onPressed: signOut,
-    //   child: const Text('Sign Out'),
-    // );
     return FloatingActionButton(
       onPressed: signOut,
       child: const Icon(Icons.logout),
@@ -78,7 +74,7 @@ class HomePage extends StatelessWidget {
                   },
                   child: const Text('Create Ride')),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             SizedBox(
               width: 200,
               height: 75,
@@ -93,28 +89,6 @@ class HomePage extends StatelessWidget {
                   },
                   child: const Text('Join Ride')),
             ),
-            // ElevatedButton(
-            //     onPressed: () async {
-            //       try {
-            //         Text(_readFromDatabase());
-            //         print('User profile has been read from the database');
-            //       } catch (error) {
-            //         print('something went wrong\n\n $error');
-            //       }
-            //     },
-            //     child: const Text('Read Data')),
-            // // _userId(),
-            // ElevatedButton(
-            //   onPressed: () async {
-            //     try {
-            //       _registerIntoDatabase();
-            //       print('User profile has been saved to the database');
-            //     } catch (error) {
-            //       print('something went wrong\n\n $error');
-            //     }
-            //   },
-            //   child: const Text('save my Profile'),
-            // ),
           ],
         ),
       ),

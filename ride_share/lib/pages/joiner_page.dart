@@ -27,6 +27,7 @@ class _JoinerPageState extends State<JoinerPage> {
     ),
   );
 
+  @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -120,7 +121,6 @@ class _JoinerPageState extends State<JoinerPage> {
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
                       return const Iterable<String>.empty();
-                      // return ["Your Location"];
                     } else {
                       List<String> sug =
                           await fetchSuggestions(textEditingValue.text);
@@ -137,7 +137,7 @@ class _JoinerPageState extends State<JoinerPage> {
                       focusNode: focusNode,
                       onEditingComplete: onFieldSubmitted,
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.local_taxi),
+                          prefixIcon: const Icon(Icons.local_taxi),
                           suffix: IconButton(
                               onPressed: () async {
                                 FocusManager.instance.primaryFocus?.unfocus();
@@ -150,16 +150,6 @@ class _JoinerPageState extends State<JoinerPage> {
 
                                 controller.setStaticPosition(
                                     [startingPoint], "location");
-                                // controller.setMarkerOfStaticPoint(
-                                //   id: "location",
-                                //   markerIcon: MarkerIcon(
-                                //     icon: Icon(
-                                //       Icons.place,
-                                //       color: Colors.red[900],
-                                //       size: 100,
-                                //     ),
-                                //   ),
-                                // );
                                 controller.setStaticPosition(
                                     [destinationPoint], "destination");
                                 controller.setMarkerOfStaticPoint(
@@ -173,14 +163,14 @@ class _JoinerPageState extends State<JoinerPage> {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.done)),
+                              icon: const Icon(Icons.done)),
                           filled: true,
-                          constraints: BoxConstraints(maxHeight: 60),
+                          constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          hintText: "Destination Location..."),
+                          hintText: "Destination Location"),
                     );
                   },
                 ),
@@ -196,8 +186,8 @@ class _JoinerPageState extends State<JoinerPage> {
             onPressed: () {
               controller.zoomIn();
             },
-            child: Icon(Icons.zoom_in),
             heroTag: null,
+            child: const Icon(Icons.zoom_in),
           ),
           const SizedBox(
             height: 10,
@@ -206,8 +196,8 @@ class _JoinerPageState extends State<JoinerPage> {
             onPressed: () {
               controller.zoomOut();
             },
-            child: Icon(Icons.zoom_out),
             heroTag: null,
+            child: const Icon(Icons.zoom_out),
           ),
           const SizedBox(
             height: 10,
@@ -248,8 +238,8 @@ class _JoinerPageState extends State<JoinerPage> {
                 );
               }
             },
-            child: Icon(Icons.directions),
             heroTag: null,
+            child: const Icon(Icons.directions),
           ),
           const SizedBox(
             height: 10,
@@ -259,8 +249,8 @@ class _JoinerPageState extends State<JoinerPage> {
               await controller.currentLocation();
               controller.zoomIn();
             },
-            child: Icon(Icons.my_location),
             heroTag: null,
+            child: const Icon(Icons.my_location),
           ),
         ],
       ),
