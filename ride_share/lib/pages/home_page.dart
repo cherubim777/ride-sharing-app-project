@@ -17,19 +17,20 @@ class HomePage extends StatelessWidget {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData = DataModel(
-            user.uid.toString(),
-            user.displayName.toString(),
-            user.phoneNumber.toString(),
-            user.email.toString());
-        userProfileData.appendIntoDatabase(currentProfileData);
+        final currentProfileData =
+            DataModel(user.uid.toString(), user.email.toString());
+        userProfileData.registerUser(currentProfileData);
       }
     });
   }
 
   _readFromDatabase() {
-    var data = userProfileData.readData('EmailAddress');
-    return data.toString();
+    final User? user = Auth().currentUser;
+    // String? _data;
+    if (user != null) {
+      final currentUser = user.uid;
+      var _data = userProfileData.readData('UserProfile');
+    }
   }
 
   Future<void> signOut() async {
@@ -89,13 +90,8 @@ class HomePage extends StatelessWidget {
                 },
                 child: const Text('Create Ride')),
             ElevatedButton(
-                onPressed: () async {
-                  try {
-                    Text(_readFromDatabase());
-                    print('User profile has been read from the database');
-                  } catch (error) {
-                    print('something went wrong\n\n $error');
-                  }
+                onPressed: () {
+                  _readFromDatabase();
                 },
                 child: const Text('Read Data')),
             // _userId(),
