@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/data/dataModel.dart';
 
 class JoinerPage extends StatefulWidget {
   JoinerPage({super.key});
@@ -18,6 +21,7 @@ class _JoinerPageState extends State<JoinerPage> {
   GeoPoint? startingPoint;
   GeoPoint? destinationPoint;
   GeoPoint? creatorPoint;
+  UserProfileData user = UserProfileData();
 
   MapController controller = MapController(
     initMapWithUserPosition: false,
@@ -40,6 +44,21 @@ class _JoinerPageState extends State<JoinerPage> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  void _registerIntoDatabase() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        // String current = user.uid.toString();
+        final currentProfileData = DataModel(
+          user.uid.toString(),
+          user.email.toString(),
+          currentLocation: startingPoint.toString(),
+          destinationLocation: destinationPoint.toString(),
+        );
+        this.user.registerUser(currentProfileData);
+      }
+    });
   }
 
   Future<List<String>> fetchSuggestions(String input) async {
@@ -227,7 +246,9 @@ class _JoinerPageState extends State<JoinerPage> {
                     ),
                   ),
                 );
-                if (startingPoint != null && destinationPoint != null) {
+                if (startingPoint != null &&
+                    destinationPoint != null &&
+                    startingPoint != creatorPoint) {
                   controller.zoomToBoundingBox(
                       BoundingBox.fromGeoPoints(
                           [startingPoint!, creatorPoint!]),

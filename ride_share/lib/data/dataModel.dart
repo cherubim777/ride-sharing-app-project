@@ -2,14 +2,14 @@
 
 class DataModel {
   DataModel(this.uid, this.email,
-      {this.userStatus = 'online',
-      this.userName = 'name',
-      this.phoneNumber = 'phoneNumber',
-      this.currentLocation = 'welete',
-      this.destinationLocation = '4kilo',
-      this.userType = 'agari'});
+      {this.userStatus = 'offline',
+      this.userName = '',
+      this.phoneNumber = '',
+      this.currentLocation = '',
+      this.destinationLocation = '',
+      this.userType = ''});
 
-  DataModel.fromJson(Map<String, dynamic> json)
+  DataModel.fromJson(Map<dynamic, dynamic> json)
       : uid = json['Uid'] as String,
         userName = json['UserName'] as String,
         phoneNumber = json['PhoneNumber'] as String,
