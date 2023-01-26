@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 import 'package:ride_share/data/dataModel.dart';
 import 'package:ride_share/data/UserProfileData.dart';
-import 'package:ride_share/pages/landing_page.dart';
+import 'package:ride_share/pages/creator_page.dart';
+import 'package:ride_share/pages/joiner_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -38,13 +39,13 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _title() {
-    return const Text('እንኩዋን በደህና መጡ፣ ታክሲ የመጋራት');
+    return const Text('Ride Share');
   }
 
   Widget _signOutButton() {
-    return ElevatedButton(
+    return FloatingActionButton(
       onPressed: signOut,
-      child: const Text('Sign Out'),
+      child: const Icon(Icons.logout),
     );
   }
 
@@ -74,42 +75,41 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _changeEntryField('new location', _controllerLocation),
-            ElevatedButton(
-              onPressed: _updateDatabaseField,
-              child: const Text('update'),
+            SizedBox(
+              width: 200,
+              height: 75,
+              child: ElevatedButton(
+                  onPressed: () {
+                    _readFromDatabase();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreatorPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Create Ride')),
             ),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MainPage(),
-                    ),
-                  );
-                },
-                child: const Text('Create Ride')),
-            ElevatedButton(
-                onPressed: () {
-                  _readFromDatabase();
-                },
-                child: const Text('Read Data')),
-            // _userId(),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  _registerIntoDatabase();
-                  print('User profile has been saved to the database');
-                } catch (error) {
-                  print('something went wrong\n\n $error');
-                }
-              },
-              child: const Text('save my Profile'),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              height: 75,
+              child: ElevatedButton(
+                  onPressed: () {
+                    _readFromDatabase();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JoinerPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Join Ride')),
             ),
-            _signOutButton(),
           ],
         ),
       ),
+      floatingActionButton: _signOutButton(),
     );
   }
 }

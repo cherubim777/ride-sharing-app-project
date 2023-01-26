@@ -1,21 +1,32 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:flutter_geocoder/geocoder.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 
-class MainPage extends StatefulWidget {
-  MainPage({super.key});
+class CreatorPage extends StatefulWidget {
+  CreatorPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<CreatorPage> createState() => _CreatorPageState();
 }
 
-class _MainPageState extends State<MainPage> {
-  GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
-  GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
+class _CreatorPageState extends State<CreatorPage> {
+  late GeoPoint currentLocation;
+
+  GeoPoint? startingPoint;
+  GeoPoint? destinationPoint;
+  int numberOfAvailableSeats = 0;
+  int passengersJoined = 0;
+
+  List<GeoPoint> joiners = [
+    GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
+    GeoPoint(latitude: 9.036000, longitude: 38.763039), // Romina
+    GeoPoint(latitude: 9.030251, longitude: 38.763458), // Abrehot Library
+    GeoPoint(latitude: 9.038204, longitude: 38.763609), // Burte
+    GeoPoint(latitude: 9.033495, longitude: 38.763833), // NBH complex
+  ];
+
+  List<GeoPoint> joined = [];
 
   MapController controller = MapController(
     initMapWithUserPosition: false,
@@ -28,34 +39,6 @@ class _MainPageState extends State<MainPage> {
     ),
   );
 
-  // String googleApikey = "AIzaSyDjg5BjkediEdY8WoxWZlnw7jT1c4yIilo";
-  // TextEditingController textController = TextEditingController();
-  // LatLng userCurrentLocation = LatLng(9.033314395327793, 38.76338387172701);
-  // LatLng destinationLocation = LatLng(9.037903472374747, 38.76270242040341);
-  // LatLng? locationChoice;
-  // final startFieldController = TextEditingController();
-  // final destinationFieldController = TextEditingController();
-  // List<Address>? placemarks;
-  // final Set<Marker> markers = new Set();
-  // Completer<GoogleMapController> _controller = Completer();
-  // GoogleMapController? mapController;
-  // String location = "Search Location";
-  // Future<Position> getCurrentLocation() async {
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     return Future.error('Error');
-  //   }
-
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //   }
-  //   if (permission == LocationPermission.deniedForever) {
-  //     return Future.error('on Denied Permanently');
-  //   }
-  //   return await Geolocator.getCurrentPosition();
-  // }
-
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -67,14 +50,6 @@ class _MainPageState extends State<MainPage> {
     super.dispose();
   }
 
-  // addMarker(String id, String title, LatLng position, double hue) {
-  //   markers.add(Marker(
-  //     markerId: MarkerId(id),
-  //     position: position,
-  //     infoWindow: InfoWindow(title: title),
-  //     icon: BitmapDescriptor.defaultMarkerWithHue(hue),
-  //   ));
-  // }
   Future<List<String>> fetchSuggestions(String input) async {
     List<String> suggestions = [];
     try {
@@ -102,122 +77,87 @@ class _MainPageState extends State<MainPage> {
     return suggestionsInfo[0].point!;
   }
 
+  Future askAvailableSpace() => showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          TextEditingController textController = TextEditingController();
+          FocusManager.instance.primaryFocus?.unfocus();
+
+          if (startingPoint != null && destinationPoint != null) {
+            controller.zoomToBoundingBox(
+                BoundingBox.fromGeoPoints([startingPoint!, destinationPoint!]),
+                paddinInPixel: 400);
+          }
+          return AlertDialog(
+            title: const Text("Number of available seats"),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            content: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: TextField(
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                controller: textController,
+              ),
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () async {
+                  if (textController.text.isEmpty) {
+                    return;
+                  }
+                  int input = int.parse(textController.text);
+                  if (input <= 0) {
+                    textController.text = "1";
+                  } else if (input >= 5) {
+                    textController.text = "5";
+                  } else {
+                    numberOfAvailableSeats = input;
+                    Navigator.of(context).pop();
+
+                    if (startingPoint != null && destinationPoint != null) {
+                      RoadInfo roadInfo = await controller.drawRoad(
+                        startingPoint!,
+                        destinationPoint!,
+                        roadType: RoadType.car,
+                        roadOption: RoadOption(
+                          roadWidth: 20,
+                          roadColor: Colors.purple[400],
+                          showMarkerOfPOI: true,
+                          zoomInto: true,
+                        ),
+                      );
+                    }
+                  }
+                },
+                child: const Text('Ok'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: Stack(
-      //   children: [
-      //     GoogleMap(
-      //       initialCameraPosition: CameraPosition(
-      //         target: userCurrentLocation,
-      //         zoom: 15,
-      //       ),
-      //       markers: markers,
-      //       myLocationEnabled: true,
-      //       myLocationButtonEnabled: true,
-      //       mapToolbarEnabled: true,
-      //       onMapCreated: ((GoogleMapController controller) {
-      //         _controller.complete(controller);
-      //         setState(() {});
-      //       }),
-      //       onCameraMove: (position) {
-      //         setState(() {
-      //           locationChoice = position.target;
-      //         });
-      //       },
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.only(bottom: 23.0),
-      //       child: Center(
-      //           child: Icon(
-      //         Icons.place,
-      //         color: Colors.red[800],
-      //         size: 40,
-      //       )),
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.all(15.0),
-      //       child: Column(
-      //         children: [
-      //           Positioned(
-      //             top: 10,
-      //             right: 15,
-      //             left: 15,
-      //             child: Container(
-      //               color: Colors.white,
-      //               child: Row(
-      //                 children: <Widget>[
-      //                   IconButton(
-      //                     splashColor: Colors.grey,
-      //                     icon: Icon(Icons.place),
-      //                     onPressed: () {},
-      //                   ),
-      //                   const Expanded(
-      //                     child: TextField(
-      //                       readOnly: true,
-      //                       showCursor: true,
-      //                       cursorColor: Colors.black,
-      //                       keyboardType: TextInputType.text,
-      //                       textInputAction: TextInputAction.go,
-      //                       decoration: InputDecoration(
-      //                           border: InputBorder.none,
-      //                           contentPadding:
-      //                               EdgeInsets.symmetric(horizontal: 15),
-      //                           hintText: "Starting Location..."),
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //           const SizedBox(
-      //             height: 10,
-      //           ),
-      //           Positioned(
-      //             top: 10,
-      //             right: 15,
-      //             left: 15,
-      //             child: Container(
-      //               color: Colors.white,
-      //               child: Row(
-      //                 children: <Widget>[
-      //                   IconButton(
-      //                     splashColor: Colors.grey,
-      //                     icon: const Icon(Icons.local_taxi),
-      //                     onPressed: () {},
-      //                   ),
-      //                   const Expanded(
-      //                     child: TextField(
-      //                       readOnly: true,
-      //                       showCursor: true,
-      //                       cursorColor: Colors.black,
-      //                       keyboardType: TextInputType.text,
-      //                       textInputAction: TextInputAction.go,
-      //                       decoration: InputDecoration(
-      //                           border: InputBorder.none,
-      //                           contentPadding:
-      //                               EdgeInsets.symmetric(horizontal: 15),
-      //                           hintText: "Destination Location"),
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      // ),
-
       body: Stack(
         children: [
           OSMFlutter(
             controller: controller,
-            // trackMyPosition: true,
             showZoomController: true,
-            androidHotReloadSupport: true,
-            initZoom: 6,
+            onLocationChanged: (p0) {
+              currentLocation = p0;
+            },
+            initZoom: 11,
             minZoomLevel: 8,
             maxZoomLevel: 19,
             stepZoom: 1.0,
@@ -262,7 +202,6 @@ class _MainPageState extends State<MainPage> {
                 Autocomplete(
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
-                      // return const Iterable<String>.empty();
                       return ["Your Location"];
                     } else {
                       List<String> sug =
@@ -281,10 +220,11 @@ class _MainPageState extends State<MainPage> {
                       focusNode: focusNode,
                       onEditingComplete: onFieldSubmitted,
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.place),
+                          prefixIcon: const Icon(Icons.place),
                           suffix: IconButton(
                               onPressed: () async {
-                                controller.removeMarker(startingPoint);
+                                controller.removeMarker(startingPoint ??
+                                    GeoPoint(latitude: 0, longitude: 0));
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
                                 startingPoint = current;
@@ -298,15 +238,14 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.arrow_right_alt)),
+                              icon: const Icon(Icons.done)),
                           filled: true,
-                          constraints: BoxConstraints(maxHeight: 60),
+                          constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          // contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                          hintText: "Starting Location..."),
+                          hintText: "Starting Location"),
                     );
                   },
                 ),
@@ -317,7 +256,6 @@ class _MainPageState extends State<MainPage> {
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
                       return const Iterable<String>.empty();
-                      // return ["Your Location"];
                     } else {
                       List<String> sug =
                           await fetchSuggestions(textEditingValue.text);
@@ -334,10 +272,11 @@ class _MainPageState extends State<MainPage> {
                       focusNode: focusNode,
                       onEditingComplete: onFieldSubmitted,
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.local_taxi),
+                          prefixIcon: const Icon(Icons.local_taxi),
                           suffix: IconButton(
                               onPressed: () async {
-                                controller.removeMarker(destinationPoint);
+                                controller.removeMarker(destinationPoint ??
+                                    GeoPoint(latitude: 0, longitude: 0));
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
                                 destinationPoint = current;
@@ -352,15 +291,14 @@ class _MainPageState extends State<MainPage> {
                                   ),
                                 );
                               },
-                              icon: Icon(Icons.arrow_right_alt)),
+                              icon: const Icon(Icons.done)),
                           filled: true,
-                          constraints: BoxConstraints(maxHeight: 60),
+                          constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          // contentPadding: EdgeInsets.symmetric(horizontal: 15),
-                          hintText: "Destination Location..."),
+                          hintText: "Destination Location"),
                     );
                   },
                 ),
@@ -374,10 +312,40 @@ class _MainPageState extends State<MainPage> {
         children: [
           FloatingActionButton(
             onPressed: () {
+              if (startingPoint != null && destinationPoint != null) {
+                if (passengersJoined < numberOfAvailableSeats) {
+                  controller.addMarker(joiners[passengersJoined]);
+                  controller.setMarkerIcon(
+                      joiners[passengersJoined],
+                      MarkerIcon(
+                        icon: Icon(
+                          Icons.man,
+                          size: 100,
+                          color: Colors.green[200],
+                        ),
+                      ));
+                  joined.add(joiners[passengersJoined]);
+                  passengersJoined++;
+
+                  controller.zoomToBoundingBox(
+                      BoundingBox.fromGeoPoints(
+                          [startingPoint!, destinationPoint!, ...joined]),
+                      paddinInPixel: 400);
+                }
+              }
+            },
+            heroTag: null,
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          FloatingActionButton(
+            onPressed: () {
               controller.zoomIn();
             },
-            child: Icon(Icons.zoom_in),
             heroTag: null,
+            child: const Icon(Icons.zoom_in),
           ),
           const SizedBox(
             height: 10,
@@ -386,32 +354,16 @@ class _MainPageState extends State<MainPage> {
             onPressed: () {
               controller.zoomOut();
             },
-            child: Icon(Icons.zoom_out),
             heroTag: null,
+            child: const Icon(Icons.zoom_out),
           ),
           const SizedBox(
             height: 10,
           ),
           FloatingActionButton(
-            onPressed: () async {
-              controller.zoomToBoundingBox(
-                  BoundingBox.fromGeoPoints([startingPoint, destinationPoint]),
-                  paddinInPixel: 400);
-
-              RoadInfo roadInfo = await controller.drawRoad(
-                destinationPoint,
-                startingPoint,
-                roadType: RoadType.car,
-                roadOption: RoadOption(
-                  roadWidth: 20,
-                  roadColor: Colors.purple[400],
-                  showMarkerOfPOI: true,
-                  zoomInto: true,
-                ),
-              );
-            },
-            child: Icon(Icons.arrow_right_alt_sharp),
+            onPressed: askAvailableSpace,
             heroTag: null,
+            child: const Icon(Icons.directions),
           ),
           const SizedBox(
             height: 10,
@@ -421,8 +373,8 @@ class _MainPageState extends State<MainPage> {
               await controller.currentLocation();
               controller.zoomIn();
             },
-            child: Icon(Icons.my_location),
             heroTag: null,
+            child: const Icon(Icons.my_location),
           ),
         ],
       ),
