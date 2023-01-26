@@ -15,8 +15,11 @@ class UserProfileData {
     final User? user = Auth().currentUser;
     if (user != null) {
       // var _userRequest = database.ref('UserProfile/${user.uid}/{$request');
-      var _userRequest =
-          database.ref().child('UserProfile').child(user.uid).child(request);
+      var _userRequest = database
+          .ref()
+          .child('UserProfile')
+          .child(user.uid)
+          .child('location/CurrentLocation');
       try {
         await _userRequest.onValue.listen((DatabaseEvent event) {
           _profile = event.snapshot.value;
