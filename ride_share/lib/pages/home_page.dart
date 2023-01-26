@@ -4,7 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 import 'package:ride_share/data/dataModel.dart';
 import 'package:ride_share/data/UserProfileData.dart';
-import 'package:ride_share/pages/landing_page.dart';
+import 'package:ride_share/pages/creator_page.dart';
+import 'package:ride_share/pages/joiner_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -37,7 +38,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _title() {
-    return const Text('እንኩዋን በደህና መጡ፣ ታክሲ የመጋራት');
+    return const Text('እንኳን በደህና መጡ፣ ታክሲ የመጋራት');
   }
 
   Widget _signOutButton() {
@@ -64,11 +65,21 @@ class HomePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MainPage(),
+                      builder: (context) => CreatorPage(),
                     ),
                   );
                 },
                 child: const Text('Create Ride')),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => JoinerPage(),
+                    ),
+                  );
+                },
+                child: const Text('Join Ride')),
             ElevatedButton(
                 onPressed: () async {
                   try {

@@ -1,19 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:flutter_geocoder/geocoder.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 
-class MainPage extends StatefulWidget {
-  MainPage({super.key});
+class CreatorPage extends StatefulWidget {
+  CreatorPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<CreatorPage> createState() => _CreatorPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _CreatorPageState extends State<CreatorPage> {
   GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
   GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
 
@@ -28,34 +25,6 @@ class _MainPageState extends State<MainPage> {
     ),
   );
 
-  // String googleApikey = "AIzaSyDjg5BjkediEdY8WoxWZlnw7jT1c4yIilo";
-  // TextEditingController textController = TextEditingController();
-  // LatLng userCurrentLocation = LatLng(9.033314395327793, 38.76338387172701);
-  // LatLng destinationLocation = LatLng(9.037903472374747, 38.76270242040341);
-  // LatLng? locationChoice;
-  // final startFieldController = TextEditingController();
-  // final destinationFieldController = TextEditingController();
-  // List<Address>? placemarks;
-  // final Set<Marker> markers = new Set();
-  // Completer<GoogleMapController> _controller = Completer();
-  // GoogleMapController? mapController;
-  // String location = "Search Location";
-  // Future<Position> getCurrentLocation() async {
-  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  //   if (!serviceEnabled) {
-  //     return Future.error('Error');
-  //   }
-
-  //   LocationPermission permission = await Geolocator.checkPermission();
-  //   if (permission == LocationPermission.denied) {
-  //     permission = await Geolocator.requestPermission();
-  //   }
-  //   if (permission == LocationPermission.deniedForever) {
-  //     return Future.error('on Denied Permanently');
-  //   }
-  //   return await Geolocator.getCurrentPosition();
-  // }
-
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -67,14 +36,6 @@ class _MainPageState extends State<MainPage> {
     super.dispose();
   }
 
-  // addMarker(String id, String title, LatLng position, double hue) {
-  //   markers.add(Marker(
-  //     markerId: MarkerId(id),
-  //     position: position,
-  //     infoWindow: InfoWindow(title: title),
-  //     icon: BitmapDescriptor.defaultMarkerWithHue(hue),
-  //   ));
-  // }
   Future<List<String>> fetchSuggestions(String input) async {
     List<String> suggestions = [];
     try {
@@ -102,119 +63,60 @@ class _MainPageState extends State<MainPage> {
     return suggestionsInfo[0].point!;
   }
 
+  Future askAvailableSpace() => showDialog(
+        context: context,
+        builder: (BuildContext c) {
+          return AlertDialog(
+            title: const Text("Enter number of available space"),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
+            content: const Padding(
+              padding: EdgeInsets.all(18.0),
+              child: TextField(
+                autofocus: true,
+              ),
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () async {
+                  controller.zoomToBoundingBox(
+                      BoundingBox.fromGeoPoints(
+                          [startingPoint, destinationPoint]),
+                      paddinInPixel: 400);
+                  Navigator.of(c).pop();
+
+                  RoadInfo roadInfo = await controller.drawRoad(
+                    destinationPoint,
+                    startingPoint,
+                    roadType: RoadType.car,
+                    roadOption: RoadOption(
+                      roadWidth: 20,
+                      roadColor: Colors.purple[400],
+                      showMarkerOfPOI: true,
+                      zoomInto: true,
+                    ),
+                  );
+                },
+                child: const Text('Ok'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(c).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+            ],
+          );
+        },
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: Stack(
-      //   children: [
-      //     GoogleMap(
-      //       initialCameraPosition: CameraPosition(
-      //         target: userCurrentLocation,
-      //         zoom: 15,
-      //       ),
-      //       markers: markers,
-      //       myLocationEnabled: true,
-      //       myLocationButtonEnabled: true,
-      //       mapToolbarEnabled: true,
-      //       onMapCreated: ((GoogleMapController controller) {
-      //         _controller.complete(controller);
-      //         setState(() {});
-      //       }),
-      //       onCameraMove: (position) {
-      //         setState(() {
-      //           locationChoice = position.target;
-      //         });
-      //       },
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.only(bottom: 23.0),
-      //       child: Center(
-      //           child: Icon(
-      //         Icons.place,
-      //         color: Colors.red[800],
-      //         size: 40,
-      //       )),
-      //     ),
-      //     Padding(
-      //       padding: const EdgeInsets.all(15.0),
-      //       child: Column(
-      //         children: [
-      //           Positioned(
-      //             top: 10,
-      //             right: 15,
-      //             left: 15,
-      //             child: Container(
-      //               color: Colors.white,
-      //               child: Row(
-      //                 children: <Widget>[
-      //                   IconButton(
-      //                     splashColor: Colors.grey,
-      //                     icon: Icon(Icons.place),
-      //                     onPressed: () {},
-      //                   ),
-      //                   const Expanded(
-      //                     child: TextField(
-      //                       readOnly: true,
-      //                       showCursor: true,
-      //                       cursorColor: Colors.black,
-      //                       keyboardType: TextInputType.text,
-      //                       textInputAction: TextInputAction.go,
-      //                       decoration: InputDecoration(
-      //                           border: InputBorder.none,
-      //                           contentPadding:
-      //                               EdgeInsets.symmetric(horizontal: 15),
-      //                           hintText: "Starting Location..."),
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //           const SizedBox(
-      //             height: 10,
-      //           ),
-      //           Positioned(
-      //             top: 10,
-      //             right: 15,
-      //             left: 15,
-      //             child: Container(
-      //               color: Colors.white,
-      //               child: Row(
-      //                 children: <Widget>[
-      //                   IconButton(
-      //                     splashColor: Colors.grey,
-      //                     icon: const Icon(Icons.local_taxi),
-      //                     onPressed: () {},
-      //                   ),
-      //                   const Expanded(
-      //                     child: TextField(
-      //                       readOnly: true,
-      //                       showCursor: true,
-      //                       cursorColor: Colors.black,
-      //                       keyboardType: TextInputType.text,
-      //                       textInputAction: TextInputAction.go,
-      //                       decoration: InputDecoration(
-      //                           border: InputBorder.none,
-      //                           contentPadding:
-      //                               EdgeInsets.symmetric(horizontal: 15),
-      //                           hintText: "Destination Location"),
-      //                     ),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ],
-      // ),
-
       body: Stack(
         children: [
           OSMFlutter(
             controller: controller,
-            // trackMyPosition: true,
             showZoomController: true,
             androidHotReloadSupport: true,
             initZoom: 6,
@@ -305,7 +207,6 @@ class _MainPageState extends State<MainPage> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          // contentPadding: EdgeInsets.symmetric(horizontal: 15),
                           hintText: "Starting Location..."),
                     );
                   },
@@ -359,7 +260,6 @@ class _MainPageState extends State<MainPage> {
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(100),
                               borderSide: BorderSide.none),
-                          // contentPadding: EdgeInsets.symmetric(horizontal: 15),
                           hintText: "Destination Location..."),
                     );
                   },
@@ -393,24 +293,8 @@ class _MainPageState extends State<MainPage> {
             height: 10,
           ),
           FloatingActionButton(
-            onPressed: () async {
-              controller.zoomToBoundingBox(
-                  BoundingBox.fromGeoPoints([startingPoint, destinationPoint]),
-                  paddinInPixel: 400);
-
-              RoadInfo roadInfo = await controller.drawRoad(
-                destinationPoint,
-                startingPoint,
-                roadType: RoadType.car,
-                roadOption: RoadOption(
-                  roadWidth: 20,
-                  roadColor: Colors.purple[400],
-                  showMarkerOfPOI: true,
-                  zoomInto: true,
-                ),
-              );
-            },
-            child: Icon(Icons.arrow_right_alt_sharp),
+            onPressed: askAvailableSpace,
+            child: Icon(Icons.directions),
             heroTag: null,
           ),
           const SizedBox(
