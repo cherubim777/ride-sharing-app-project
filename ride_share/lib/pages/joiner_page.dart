@@ -12,8 +12,11 @@ class JoinerPage extends StatefulWidget {
 }
 
 class _JoinerPageState extends State<JoinerPage> {
-  GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
-  GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
+  // GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
+  // GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
+
+  GeoPoint? startingPoint;
+  GeoPoint? destinationPoint;
   GeoPoint? creatorPoint;
 
   MapController controller = MapController(
@@ -75,7 +78,7 @@ class _JoinerPageState extends State<JoinerPage> {
             controller: controller,
             showZoomController: true,
             androidHotReloadSupport: true,
-            initZoom: 6,
+            initZoom: 11,
             minZoomLevel: 8,
             maxZoomLevel: 19,
             stepZoom: 1.0,
@@ -148,20 +151,24 @@ class _JoinerPageState extends State<JoinerPage> {
                                 startingPoint = await controller.myLocation();
                                 destinationPoint = current;
 
-                                controller.setStaticPosition(
-                                    [startingPoint], "location");
-                                controller.setStaticPosition(
-                                    [destinationPoint], "destination");
-                                controller.setMarkerOfStaticPoint(
-                                  id: "destination",
-                                  markerIcon: MarkerIcon(
-                                    icon: Icon(
-                                      Icons.place,
-                                      color: Colors.blue[900],
-                                      size: 100,
-                                    ),
-                                  ),
-                                );
+                                if (startingPoint != null) {
+                                  controller.setStaticPosition(
+                                      [startingPoint!], "location");
+                                  if (destinationPoint != null) {
+                                    controller.setStaticPosition(
+                                        [destinationPoint!], "destination");
+                                    controller.setMarkerOfStaticPoint(
+                                      id: "destination",
+                                      markerIcon: MarkerIcon(
+                                        icon: Icon(
+                                          Icons.place,
+                                          color: Colors.blue[900],
+                                          size: 100,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                }
                               },
                               icon: const Icon(Icons.done)),
                           filled: true,
@@ -220,22 +227,24 @@ class _JoinerPageState extends State<JoinerPage> {
                     ),
                   ),
                 );
+                if (startingPoint != null && destinationPoint != null) {
+                  controller.zoomToBoundingBox(
+                      BoundingBox.fromGeoPoints(
+                          [startingPoint!, creatorPoint!]),
+                      paddinInPixel: 350);
 
-                controller.zoomToBoundingBox(
-                    BoundingBox.fromGeoPoints([startingPoint, creatorPoint!]),
-                    paddinInPixel: 400);
-
-                RoadInfo roadInfo = await controller.drawRoad(
-                  startingPoint,
-                  creatorPoint!,
-                  roadType: RoadType.car,
-                  roadOption: RoadOption(
-                    roadWidth: 20,
-                    roadColor: Colors.purple[400],
-                    showMarkerOfPOI: true,
-                    zoomInto: true,
-                  ),
-                );
+                  RoadInfo roadInfo = await controller.drawRoad(
+                    startingPoint!,
+                    creatorPoint!,
+                    roadType: RoadType.car,
+                    roadOption: RoadOption(
+                      roadWidth: 20,
+                      roadColor: Colors.purple[400],
+                      showMarkerOfPOI: true,
+                      zoomInto: true,
+                    ),
+                  );
+                }
               }
             },
             heroTag: null,

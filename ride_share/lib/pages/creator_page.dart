@@ -12,9 +12,21 @@ class CreatorPage extends StatefulWidget {
 
 class _CreatorPageState extends State<CreatorPage> {
   late GeoPoint currentLocation;
-  GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
-  GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
+
+  GeoPoint? startingPoint;
+  GeoPoint? destinationPoint;
   int numberOfAvailableSeats = 0;
+  int passengersJoined = 0;
+
+  List<GeoPoint> joiners = [
+    GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
+    GeoPoint(latitude: 9.036000, longitude: 38.763039), // Romina
+    GeoPoint(latitude: 9.030251, longitude: 38.763458), // Abrehot Library
+    GeoPoint(latitude: 9.038204, longitude: 38.763609), // Burte
+    GeoPoint(latitude: 9.033495, longitude: 38.763833), // NBH complex
+  ];
+
+  List<GeoPoint> joined = [];
 
   MapController controller = MapController(
     initMapWithUserPosition: false,
@@ -67,16 +79,17 @@ class _CreatorPageState extends State<CreatorPage> {
 
   Future askAvailableSpace() => showDialog(
         context: context,
-        builder: (BuildContext c) {
+        builder: (BuildContext context) {
           TextEditingController textController = TextEditingController();
           FocusManager.instance.primaryFocus?.unfocus();
 
-          controller.zoomToBoundingBox(
-              BoundingBox.fromGeoPoints([startingPoint, destinationPoint]),
-              paddinInPixel: 100);
-
+          if (startingPoint != null && destinationPoint != null) {
+            controller.zoomToBoundingBox(
+                BoundingBox.fromGeoPoints([startingPoint!, destinationPoint!]),
+                paddinInPixel: 400);
+          }
           return AlertDialog(
-            title: const Text("Enter number of available space"),
+            title: const Text("Number of available seats"),
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20))),
             content: Padding(
@@ -93,31 +106,38 @@ class _CreatorPageState extends State<CreatorPage> {
             actions: [
               ElevatedButton(
                 onPressed: () async {
-                  if (int.parse(textController.text) <= 0) {
+                  if (textController.text.isEmpty) {
+                    return;
+                  }
+                  int input = int.parse(textController.text);
+                  if (input <= 0) {
                     textController.text = "1";
-                  } else if (int.parse(textController.text) >= 5) {
+                  } else if (input >= 5) {
                     textController.text = "5";
                   } else {
-                    Navigator.of(c).pop();
+                    numberOfAvailableSeats = input;
+                    Navigator.of(context).pop();
 
-                    RoadInfo roadInfo = await controller.drawRoad(
-                      destinationPoint,
-                      startingPoint,
-                      roadType: RoadType.car,
-                      roadOption: RoadOption(
-                        roadWidth: 20,
-                        roadColor: Colors.purple[400],
-                        showMarkerOfPOI: true,
-                        zoomInto: true,
-                      ),
-                    );
+                    if (startingPoint != null && destinationPoint != null) {
+                      RoadInfo roadInfo = await controller.drawRoad(
+                        startingPoint!,
+                        destinationPoint!,
+                        roadType: RoadType.car,
+                        roadOption: RoadOption(
+                          roadWidth: 20,
+                          roadColor: Colors.purple[400],
+                          showMarkerOfPOI: true,
+                          zoomInto: true,
+                        ),
+                      );
+                    }
                   }
                 },
                 child: const Text('Ok'),
               ),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.of(c).pop();
+                  Navigator.of(context).pop();
                 },
                 child: const Text('Cancel'),
               ),
@@ -137,7 +157,7 @@ class _CreatorPageState extends State<CreatorPage> {
             onLocationChanged: (p0) {
               currentLocation = p0;
             },
-            initZoom: 6,
+            initZoom: 11,
             minZoomLevel: 8,
             maxZoomLevel: 19,
             stepZoom: 1.0,
@@ -203,7 +223,8 @@ class _CreatorPageState extends State<CreatorPage> {
                           prefixIcon: const Icon(Icons.place),
                           suffix: IconButton(
                               onPressed: () async {
-                                controller.removeMarker(startingPoint);
+                                controller.removeMarker(startingPoint ??
+                                    GeoPoint(latitude: 0, longitude: 0));
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
                                 startingPoint = current;
@@ -217,7 +238,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                   ),
                                 );
                               },
-                              icon: const Icon(Icons.arrow_right_alt)),
+                              icon: const Icon(Icons.done)),
                           filled: true,
                           constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
@@ -254,7 +275,8 @@ class _CreatorPageState extends State<CreatorPage> {
                           prefixIcon: const Icon(Icons.local_taxi),
                           suffix: IconButton(
                               onPressed: () async {
-                                controller.removeMarker(destinationPoint);
+                                controller.removeMarker(destinationPoint ??
+                                    GeoPoint(latitude: 0, longitude: 0));
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
                                 destinationPoint = current;
@@ -269,7 +291,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                   ),
                                 );
                               },
-                              icon: const Icon(Icons.arrow_right_alt)),
+                              icon: const Icon(Icons.done)),
                           filled: true,
                           constraints: const BoxConstraints(maxHeight: 60),
                           fillColor: Colors.grey[100],
@@ -288,6 +310,36 @@ class _CreatorPageState extends State<CreatorPage> {
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          FloatingActionButton(
+            onPressed: () {
+              if (startingPoint != null && destinationPoint != null) {
+                if (passengersJoined < numberOfAvailableSeats) {
+                  controller.addMarker(joiners[passengersJoined]);
+                  controller.setMarkerIcon(
+                      joiners[passengersJoined],
+                      MarkerIcon(
+                        icon: Icon(
+                          Icons.man,
+                          size: 100,
+                          color: Colors.green[200],
+                        ),
+                      ));
+                  joined.add(joiners[passengersJoined]);
+                  passengersJoined++;
+
+                  controller.zoomToBoundingBox(
+                      BoundingBox.fromGeoPoints(
+                          [startingPoint!, destinationPoint!, ...joined]),
+                      paddinInPixel: 400);
+                }
+              }
+            },
+            heroTag: null,
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
           FloatingActionButton(
             onPressed: () {
               controller.zoomIn();

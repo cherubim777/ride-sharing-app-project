@@ -65,6 +65,7 @@ class HomePage extends StatelessWidget {
               height: 75,
               child: ElevatedButton(
                   onPressed: () {
+                    _readFromDatabase();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -80,6 +81,7 @@ class HomePage extends StatelessWidget {
               height: 75,
               child: ElevatedButton(
                   onPressed: () {
+                    _readFromDatabase();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
