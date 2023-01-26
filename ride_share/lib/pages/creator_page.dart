@@ -11,8 +11,10 @@ class CreatorPage extends StatefulWidget {
 }
 
 class _CreatorPageState extends State<CreatorPage> {
+  late GeoPoint currentLocation;
   GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
   GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
+  int numberOfAvailableSeats = 0;
 
   MapController controller = MapController(
     initMapWithUserPosition: false,
@@ -66,36 +68,50 @@ class _CreatorPageState extends State<CreatorPage> {
   Future askAvailableSpace() => showDialog(
         context: context,
         builder: (BuildContext c) {
+          TextEditingController textController = TextEditingController();
+          FocusManager.instance.primaryFocus?.unfocus();
+
+          controller.zoomToBoundingBox(
+              BoundingBox.fromGeoPoints([startingPoint, destinationPoint]),
+              paddinInPixel: 100);
+
           return AlertDialog(
             title: const Text("Enter number of available space"),
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20))),
-            content: const Padding(
-              padding: EdgeInsets.all(18.0),
+            content: Padding(
+              padding: const EdgeInsets.all(18.0),
               child: TextField(
                 autofocus: true,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+                controller: textController,
               ),
             ),
             actions: [
               ElevatedButton(
                 onPressed: () async {
-                  controller.zoomToBoundingBox(
-                      BoundingBox.fromGeoPoints(
-                          [startingPoint, destinationPoint]),
-                      paddinInPixel: 400);
-                  Navigator.of(c).pop();
+                  if (int.parse(textController.text) <= 0) {
+                    textController.text = "1";
+                  } else if (int.parse(textController.text) >= 5) {
+                    textController.text = "5";
+                  } else {
+                    Navigator.of(c).pop();
 
-                  RoadInfo roadInfo = await controller.drawRoad(
-                    destinationPoint,
-                    startingPoint,
-                    roadType: RoadType.car,
-                    roadOption: RoadOption(
-                      roadWidth: 20,
-                      roadColor: Colors.purple[400],
-                      showMarkerOfPOI: true,
-                      zoomInto: true,
-                    ),
-                  );
+                    RoadInfo roadInfo = await controller.drawRoad(
+                      destinationPoint,
+                      startingPoint,
+                      roadType: RoadType.car,
+                      roadOption: RoadOption(
+                        roadWidth: 20,
+                        roadColor: Colors.purple[400],
+                        showMarkerOfPOI: true,
+                        zoomInto: true,
+                      ),
+                    );
+                  }
                 },
                 child: const Text('Ok'),
               ),
@@ -118,7 +134,10 @@ class _CreatorPageState extends State<CreatorPage> {
           OSMFlutter(
             controller: controller,
             showZoomController: true,
-            androidHotReloadSupport: true,
+            // androidHotReloadSupport: true,
+            onLocationChanged: (p0) {
+              currentLocation = p0;
+            },
             initZoom: 6,
             minZoomLevel: 8,
             maxZoomLevel: 19,

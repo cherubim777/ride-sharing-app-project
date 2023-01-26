@@ -38,13 +38,17 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _title() {
-    return const Text('እንኳን በደህና መጡ፣ ታክሲ የመጋራት');
+    return const Text('Ride Share');
   }
 
   Widget _signOutButton() {
-    return ElevatedButton(
+    // return ElevatedButton(
+    //   onPressed: signOut,
+    //   child: const Text('Sign Out'),
+    // );
+    return FloatingActionButton(
       onPressed: signOut,
-      child: const Text('Sign Out'),
+      child: const Icon(Icons.logout),
     );
   }
 
@@ -60,52 +64,61 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CreatorPage(),
-                    ),
-                  );
-                },
-                child: const Text('Create Ride')),
-            ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => JoinerPage(),
-                    ),
-                  );
-                },
-                child: const Text('Join Ride')),
-            ElevatedButton(
-                onPressed: () async {
-                  try {
-                    Text(_readFromDatabase());
-                    print('User profile has been read from the database');
-                  } catch (error) {
-                    print('something went wrong\n\n $error');
-                  }
-                },
-                child: const Text('Read Data')),
-            // _userId(),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  _registerIntoDatabase();
-                  print('User profile has been saved to the database');
-                } catch (error) {
-                  print('something went wrong\n\n $error');
-                }
-              },
-              child: const Text('save my Profile'),
+            SizedBox(
+              width: 200,
+              height: 75,
+              child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreatorPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Create Ride')),
             ),
-            _signOutButton(),
+            SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              height: 75,
+              child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JoinerPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Join Ride')),
+            ),
+            // ElevatedButton(
+            //     onPressed: () async {
+            //       try {
+            //         Text(_readFromDatabase());
+            //         print('User profile has been read from the database');
+            //       } catch (error) {
+            //         print('something went wrong\n\n $error');
+            //       }
+            //     },
+            //     child: const Text('Read Data')),
+            // // _userId(),
+            // ElevatedButton(
+            //   onPressed: () async {
+            //     try {
+            //       _registerIntoDatabase();
+            //       print('User profile has been saved to the database');
+            //     } catch (error) {
+            //       print('something went wrong\n\n $error');
+            //     }
+            //   },
+            //   child: const Text('save my Profile'),
+            // ),
           ],
         ),
       ),
+      floatingActionButton: _signOutButton(),
     );
   }
 }

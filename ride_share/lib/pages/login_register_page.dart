@@ -46,24 +46,32 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _title() {
-    return const Text('ይመዝገቡ');
+    return const Text('Ride Share');
   }
 
   Widget _entryField(
     String title,
     TextEditingController controller,
   ) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: title,
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: title,
+        ),
       ),
     );
   }
 
   Widget _errorMessage() {
     print(errorMessage);
-    return Text(errorMessage == '' ? '' : 'አወይ.... የሆነ ነገረ ተበላህ 🫤🧐🤨');
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18.0),
+      child:
+          // return Text(errorMessage == '' ? '' : 'አወይ.... የሆነ ነገረ ተበላህ 🫤🧐🤨');
+          Text(errorMessage == '' ? '' : 'Something went wrong'),
+    );
   }
 
   Widget _submitButton() {
@@ -71,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
       onPressed: isLoggedIn
           ? signInWithEmailAndPassword
           : createUserWithEmailAndPassword,
-      child: Text(isLoggedIn ? "login" : "register"),
+      child: Text(isLoggedIn ? "Login" : "Register"),
     );
   }
 
@@ -100,8 +108,8 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              _entryField('email', _controllerEmail),
-              _entryField('password', _controllerPassword),
+              _entryField('Email', _controllerEmail),
+              _entryField('Password', _controllerPassword),
               _errorMessage(),
               _submitButton(),
               _loginOrRegisterButton(),
