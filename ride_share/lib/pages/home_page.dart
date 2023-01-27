@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 import 'package:ride_share/data/dataModel.dart';
 import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/pages/creator_page.dart';
+import 'package:ride_share/pages/joiner_page.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -16,19 +18,20 @@ class HomePage extends StatelessWidget {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData = DataModel(
-            user.uid.toString(),
-            user.displayName.toString(),
-            user.phoneNumber.toString(),
-            user.email.toString());
-        userProfileData.appendIntoDatabase(currentProfileData);
+        final currentProfileData =
+            DataModel(user.uid.toString(), user.email.toString());
+        userProfileData.registerUser(currentProfileData);
       }
     });
   }
 
   _readFromDatabase() {
-    var data = userProfileData.readData('EmailAddress');
-    return data.toString();
+    final User? user = Auth().currentUser;
+    // String? _data;
+    if (user != null) {
+      final currentUser = user.uid;
+      var _data = userProfileData.readData('UserProfile');
+    }
   }
 
   Future<void> signOut() async {
@@ -36,14 +39,28 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _title() {
-    return const Text('እንኩዋን በደህና መጡ፣ ታክሲ የመጋራት');
+    return const Text('Ride Share');
   }
 
   Widget _signOutButton() {
-    return ElevatedButton(
+    return FloatingActionButton(
       onPressed: signOut,
-      child: const Text('Sign Out'),
+      child: const Icon(Icons.logout),
     );
+  }
+
+  final TextEditingController _controllerLocation = TextEditingController();
+  Widget _changeEntryField(String title, TextEditingController controller) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: title,
+      ),
+    );
+  }
+
+  _updateDatabaseField() {
+    userProfileData.updateUserData(_controllerLocation.text);
   }
 
   @override
@@ -58,32 +75,41 @@ class HomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ElevatedButton(
-                onPressed: () async {
-                  try {
-                    Text(_readFromDatabase());
-                    print('User profile has been read from the database');
-                  } catch (error) {
-                    print('something went wrong\n\n $error');
-                  }
-                },
-                child: const Text('Read Data')),
-            // _userId(),
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  _registerIntoDatabase();
-                  print('User profile has been saved to the database');
-                } catch (error) {
-                  print('something went wrong\n\n $error');
-                }
-              },
-              child: const Text('save my Profile'),
+            SizedBox(
+              width: 200,
+              height: 75,
+              child: ElevatedButton(
+                  onPressed: () {
+                    _readFromDatabase();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreatorPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Create Ride')),
             ),
-            _signOutButton(),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 200,
+              height: 75,
+              child: ElevatedButton(
+                  onPressed: () {
+                    _readFromDatabase();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JoinerPage(),
+                      ),
+                    );
+                  },
+                  child: const Text('Join Ride')),
+            ),
           ],
         ),
       ),
+      floatingActionButton: _signOutButton(),
     );
   }
 }
