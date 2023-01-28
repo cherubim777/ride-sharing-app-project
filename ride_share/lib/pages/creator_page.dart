@@ -178,159 +178,14 @@ class _CreatorPageState extends State<CreatorPage> {
     return Scaffold(
       body: Stack(
         children: [
-          OSMFlutter(
-            controller: controller,
-            showZoomController: true,
-            onLocationChanged: (p0) {
-              currentLocation = p0;
-            },
-            initZoom: 11,
-            minZoomLevel: 8,
-            maxZoomLevel: 19,
-            stepZoom: 1.0,
-            userLocationMarker: UserLocationMaker(
-              personMarker: const MarkerIcon(
-                icon: Icon(
-                  Icons.location_history_rounded,
-                  color: Colors.red,
-                  size: 48,
-                ),
-              ),
-              directionArrowMarker: const MarkerIcon(
-                icon: Icon(
-                  Icons.place,
-                  size: 48,
-                ),
-              ),
-            ),
-            roadConfiguration: RoadConfiguration(
-              startIcon: const MarkerIcon(
-                icon: Icon(
-                  Icons.person,
-                  size: 64,
-                  color: Colors.brown,
-                ),
-              ),
-              roadColor: Colors.yellowAccent,
-            ),
-            markerOption: MarkerOption(
-                defaultMarker: const MarkerIcon(
-              icon: Icon(
-                Icons.person_pin_circle,
-                color: Colors.blue,
-                size: 56,
-              ),
-            )),
-          ),
+          osmMap(),
           Padding(
             padding: const EdgeInsets.all(15.0),
             child: Column(
               children: [
-                Autocomplete(
-                  optionsBuilder: (TextEditingValue textEditingValue) async {
-                    if (textEditingValue.text.isEmpty) {
-                      return ["Your Location"];
-                    } else {
-                      List<String> sug =
-                          await fetchSuggestions(textEditingValue.text);
-
-                      return sug.where((word) => word
-                          .toLowerCase()
-                          .contains(textEditingValue.text.toLowerCase()));
-                    }
-                  },
-                  fieldViewBuilder: (context, textEditingController, focusNode,
-                      onFieldSubmitted) {
-                    return TextField(
-                      onSubmitted: (value) {},
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      onEditingComplete: onFieldSubmitted,
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.place),
-                          suffix: IconButton(
-                              onPressed: () async {
-                                controller.removeMarker(startingPoint ??
-                                    GeoPoint(latitude: 0, longitude: 0));
-                                GeoPoint current = await getPointFromAddress(
-                                    textEditingController.text);
-                                startingPoint = current;
-                                _registerIntoDatabase();
-                                controller.removeMarker(current);
-                                controller.changeLocation(current);
-                                controller.setMarkerIcon(
-                                  current,
-                                  MarkerIcon(
-                                    icon: Icon(Icons.place,
-                                        color: Colors.red[900], size: 100),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.done)),
-                          filled: true,
-                          constraints: const BoxConstraints(maxHeight: 60),
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              borderSide: BorderSide.none),
-                          hintText: "Starting Location"),
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Autocomplete(
-                  optionsBuilder: (TextEditingValue textEditingValue) async {
-                    if (textEditingValue.text.isEmpty) {
-                      return const Iterable<String>.empty();
-                    } else {
-                      List<String> sug =
-                          await fetchSuggestions(textEditingValue.text);
-
-                      return sug.where((word) => word
-                          .toLowerCase()
-                          .contains(textEditingValue.text.toLowerCase()));
-                    }
-                  },
-                  fieldViewBuilder: (context, textEditingController, focusNode,
-                      onFieldSubmitted) {
-                    return TextField(
-                      controller: textEditingController,
-                      focusNode: focusNode,
-                      onEditingComplete: onFieldSubmitted,
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.local_taxi),
-                          suffix: IconButton(
-                              onPressed: () async {
-                                controller.removeMarker(destinationPoint ??
-                                    GeoPoint(latitude: 0, longitude: 0));
-                                GeoPoint current = await getPointFromAddress(
-                                    textEditingController.text);
-                                destinationPoint = current;
-                                _registerIntoDatabase();
-                                controller.removeMarker(current);
-                                controller.changeLocation(current);
-
-                                controller.setMarkerIcon(
-                                  current,
-                                  MarkerIcon(
-                                    icon: Icon(Icons.place,
-                                        color: Colors.blue[900], size: 100),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.done)),
-                          filled: true,
-                          constraints: const BoxConstraints(maxHeight: 60),
-                          fillColor: Colors.grey[100],
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              borderSide: BorderSide.none),
-                          hintText: "Destination Location"),
-                    );
-                  },
-                ),
+                autocompleteTextField("Starting Location"),
+                const SizedBox(height: 10),
+                autocompleteTextField("Destination Location"),
               ],
             ),
           )
@@ -340,29 +195,7 @@ class _CreatorPageState extends State<CreatorPage> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () {
-              if (startingPoint != null && destinationPoint != null) {
-                if (passengersJoined < numberOfAvailableSeats) {
-                  controller.addMarker(joiners[passengersJoined]);
-                  controller.setMarkerIcon(
-                      joiners[passengersJoined],
-                      const MarkerIcon(
-                        icon: Icon(
-                          Icons.man,
-                          size: 100,
-                          color: Colors.black,
-                        ),
-                      ));
-                  joined.add(joiners[passengersJoined]);
-                  passengersJoined++;
-
-                  controller.zoomToBoundingBox(
-                      BoundingBox.fromGeoPoints(
-                          [startingPoint!, destinationPoint!, ...joined]),
-                      paddinInPixel: 400);
-                }
-              }
-            },
+            onPressed: addMarkerAction,
             heroTag: null,
             child: const Icon(Icons.add),
           ),
@@ -370,9 +203,7 @@ class _CreatorPageState extends State<CreatorPage> {
             height: 10,
           ),
           FloatingActionButton(
-            onPressed: () {
-              controller.zoomIn();
-            },
+            onPressed: (() => controller.zoomIn()),
             heroTag: null,
             child: const Icon(Icons.zoom_in),
           ),
@@ -380,9 +211,7 @@ class _CreatorPageState extends State<CreatorPage> {
             height: 10,
           ),
           FloatingActionButton(
-            onPressed: () {
-              controller.zoomOut();
-            },
+            onPressed: (() => controller.zoomOut()),
             heroTag: null,
             child: const Icon(Icons.zoom_out),
           ),
@@ -407,6 +236,143 @@ class _CreatorPageState extends State<CreatorPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void addMarkerAction() {
+    if (startingPoint != null && destinationPoint != null) {
+      if (passengersJoined < numberOfAvailableSeats) {
+        controller.addMarker(joiners[passengersJoined]);
+        controller.setMarkerIcon(
+            joiners[passengersJoined],
+            const MarkerIcon(
+              icon: Icon(
+                Icons.man,
+                size: 100,
+                color: Colors.black,
+              ),
+            ));
+        joined.add(joiners[passengersJoined]);
+        passengersJoined++;
+
+        controller.zoomToBoundingBox(
+            BoundingBox.fromGeoPoints(
+                [startingPoint!, destinationPoint!, ...joined]),
+            paddinInPixel: 400);
+      }
+    }
+  }
+
+  Autocomplete<String> autocompleteTextField(String hintText) {
+    return Autocomplete(
+      optionsBuilder: (TextEditingValue textEditingValue) async {
+        if (textEditingValue.text.isEmpty) {
+          if (hintText == "Starting Location") {
+            return ["Your Location"];
+          } else {
+            return const Iterable<String>.empty();
+          }
+        } else {
+          List<String> sug = await fetchSuggestions(textEditingValue.text);
+
+          return sug.where((word) =>
+              word.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+        }
+      },
+      fieldViewBuilder:
+          (context, textEditingController, focusNode, onFieldSubmitted) {
+        return TextField(
+          onSubmitted: (value) {},
+          controller: textEditingController,
+          focusNode: focusNode,
+          onEditingComplete: onFieldSubmitted,
+          decoration: InputDecoration(
+              prefixIcon: hintText == "Starting Location"
+                  ? const Icon(Icons.place)
+                  : const Icon(Icons.local_taxi),
+              suffix: IconButton(
+                  onPressed: () async {
+                    GeoPoint current =
+                        await getPointFromAddress(textEditingController.text);
+                    controller.removeMarker(current);
+
+                    hintText == "Starting Location"
+                        ? startingPoint = current
+                        : destinationPoint = current;
+                    _registerIntoDatabase();
+                    controller.removeMarker(current);
+                    controller.changeLocation(current);
+                    controller.setMarkerIcon(
+                      current,
+                      MarkerIcon(
+                        icon: Icon(Icons.place,
+                            color: hintText == "Starting Location"
+                                ? Colors.red[900]
+                                : Colors.blue[900],
+                            size: 100),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.done)),
+              filled: true,
+              constraints: const BoxConstraints(maxHeight: 60),
+              fillColor: Colors.grey[100],
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(100),
+                  borderSide: BorderSide.none),
+              hintText: hintText),
+        );
+      },
+    );
+  }
+
+  OSMFlutter osmMap() {
+    return OSMFlutter(
+      controller: controller,
+      showZoomController: true,
+      onLocationChanged: (p0) {
+        currentLocation = p0;
+      },
+      onGeoPointClicked: (p0) {
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      initZoom: 11,
+      minZoomLevel: 8,
+      maxZoomLevel: 19,
+      stepZoom: 1.0,
+      userLocationMarker: UserLocationMaker(
+        personMarker: const MarkerIcon(
+          icon: Icon(
+            Icons.location_history_rounded,
+            color: Colors.red,
+            size: 48,
+          ),
+        ),
+        directionArrowMarker: const MarkerIcon(
+          icon: Icon(
+            Icons.place,
+            size: 48,
+          ),
+        ),
+      ),
+      roadConfiguration: RoadConfiguration(
+        startIcon: const MarkerIcon(
+          icon: Icon(
+            Icons.person,
+            size: 64,
+            color: Colors.brown,
+          ),
+        ),
+        roadColor: Colors.yellowAccent,
+      ),
+      markerOption: MarkerOption(
+          defaultMarker: const MarkerIcon(
+        icon: Icon(
+          Icons.person_pin_circle,
+          color: Colors.blue,
+          size: 56,
+        ),
+      )),
     );
   }
 }
