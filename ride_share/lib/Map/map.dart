@@ -2,8 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 
 class MyMap {
-  static late GeoPoint currentLocation;
-  static MapController controller = MapController(
+  GeoPoint? startingPoint;
+  GeoPoint? destinationPoint;
+
+  int passengersJoined = 0;
+
+  late GeoPoint currentLocation;
+
+  List<GeoPoint> joiners = [
+    GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
+    GeoPoint(latitude: 9.036000, longitude: 38.763039), // Romina
+    GeoPoint(latitude: 9.030251, longitude: 38.763458), // Abrehot Library
+    GeoPoint(latitude: 9.038204, longitude: 38.763609), // Burte
+    GeoPoint(latitude: 9.033495, longitude: 38.763833), // NBH complex
+  ];
+
+  List<GeoPoint> joined = [];
+
+  MapController controller = MapController(
     initMapWithUserPosition: false,
     initPosition: GeoPoint(latitude: 9.005401, longitude: 38.763611),
     areaLimit: BoundingBox(
@@ -14,7 +30,7 @@ class MyMap {
     ),
   );
 
-  static OSMFlutter osmMap() {
+  OSMFlutter showMap() {
     return OSMFlutter(
       controller: controller,
       showZoomController: true,
@@ -62,5 +78,34 @@ class MyMap {
         ),
       )),
     );
+  }
+
+  void addMarkerAction(int numberOfAvailableSeats) {
+    if (startingPoint != null && destinationPoint != null) {
+      if (passengersJoined < numberOfAvailableSeats) {
+        controller.addMarker(joiners[passengersJoined]);
+        controller.setMarkerIcon(
+            joiners[passengersJoined],
+            const MarkerIcon(
+              icon: Icon(
+                Icons.man,
+                size: 100,
+                color: Colors.black,
+              ),
+            ));
+        joined.add(joiners[passengersJoined]);
+        passengersJoined++;
+
+        controller.zoomToBoundingBox(
+            BoundingBox.fromGeoPoints(
+                [startingPoint!, destinationPoint!, ...joined]),
+            paddinInPixel: 400);
+      }
+    }
+  }
+
+  void goToMyLocation() async {
+    await controller.currentLocation();
+    controller.setZoom(zoomLevel: 15);
   }
 }
