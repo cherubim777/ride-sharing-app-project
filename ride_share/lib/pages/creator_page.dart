@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/data/dataModel.dart';
 
 class CreatorPage extends StatefulWidget {
   CreatorPage({super.key});
@@ -18,6 +21,7 @@ class _CreatorPageState extends State<CreatorPage> {
   int numberOfAvailableSeats = 0;
   int passengersJoined = 0;
 
+  UserProfileData user = UserProfileData();
   List<GeoPoint> joiners = [
     GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
     GeoPoint(latitude: 9.036000, longitude: 38.763039), // Romina
@@ -47,7 +51,24 @@ class _CreatorPageState extends State<CreatorPage> {
   @override
   void dispose() {
     controller.dispose();
+    _registerIntoDatabase(status: "offline");
     super.dispose();
+  }
+
+  void _registerIntoDatabase({String status = "offline"}) {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        // String current = user.uid.toString();
+        final currentProfileData = DataModel(
+          user.uid.toString(),
+          user.email.toString(),
+          currentLocation: startingPoint.toString(),
+          destinationLocation: destinationPoint.toString(),
+          userStatus: status,
+        );
+        this.user.registerUser(currentProfileData);
+      }
+    });
   }
 
   Future<List<String>> fetchSuggestions(String input) async {
@@ -59,7 +80,10 @@ class _CreatorPageState extends State<CreatorPage> {
         return [];
       }
       for (var info in suggestionsInfo) {
-        suggestions.add(info.address.toString());
+        if (info.address?.country == "ኢትዮጵያ") {
+          print(info.address?.country);
+          suggestions.add(info.address.toString());
+        }
       }
     } catch (error) {
       return [];
@@ -116,9 +140,12 @@ class _CreatorPageState extends State<CreatorPage> {
                     textController.text = "5";
                   } else {
                     numberOfAvailableSeats = input;
+                    _registerIntoDatabase(status: "online");
                     Navigator.of(context).pop();
 
-                    if (startingPoint != null && destinationPoint != null) {
+                    if (startingPoint != null &&
+                        destinationPoint != null &&
+                        startingPoint != destinationPoint) {
                       RoadInfo roadInfo = await controller.drawRoad(
                         startingPoint!,
                         destinationPoint!,
@@ -228,6 +255,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
                                 startingPoint = current;
+                                _registerIntoDatabase();
                                 controller.removeMarker(current);
                                 controller.changeLocation(current);
                                 controller.setMarkerIcon(
@@ -280,6 +308,7 @@ class _CreatorPageState extends State<CreatorPage> {
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
                                 destinationPoint = current;
+                                _registerIntoDatabase();
                                 controller.removeMarker(current);
                                 controller.changeLocation(current);
 
@@ -317,11 +346,11 @@ class _CreatorPageState extends State<CreatorPage> {
                   controller.addMarker(joiners[passengersJoined]);
                   controller.setMarkerIcon(
                       joiners[passengersJoined],
-                      MarkerIcon(
+                      const MarkerIcon(
                         icon: Icon(
                           Icons.man,
                           size: 100,
-                          color: Colors.green[200],
+                          color: Colors.black,
                         ),
                       ));
                   joined.add(joiners[passengersJoined]);
