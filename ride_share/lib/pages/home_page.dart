@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 import 'package:ride_share/data/dataModel.dart';
-import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/data/data_access_object.dart';
 import 'package:ride_share/pages/creator_page.dart';
 import 'package:ride_share/pages/joiner_page.dart';
 
@@ -12,27 +12,27 @@ class HomePage extends StatelessWidget {
 
   final User? user = Auth().currentUser;
   final database = FirebaseDatabase.instance;
-  var userProfileData = UserProfileData();
+  var userProfileData = DataAccessObject();
 
   void _registerIntoDatabase() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData =
-            DataModel(user.uid.toString(), user.email.toString());
+        final currentProfileData = Users(
+            uid: user.uid.toString(), emailAddress: user.email.toString());
         userProfileData.registerUser(currentProfileData);
       }
     });
   }
 
-  _readFromDatabase() {
-    final User? user = Auth().currentUser;
-    // String? _data;
-    if (user != null) {
-      final currentUser = user.uid;
-      var _data = userProfileData.readData('UserProfile');
-    }
-  }
+  // _readFromDatabase() {
+  //   final User? user = Auth().currentUser;
+  //   // String? _data;
+  //   if (user != null) {
+  //     final currentUser = user.uid;
+  //     var _data = userProfileData.readData('UserProfile');
+  //   }
+  // }
 
   Future<void> signOut() async {
     await Auth().signOut();
@@ -59,9 +59,9 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  _updateDatabaseField() {
-    userProfileData.updateUserData(_controllerLocation.text);
-  }
+  // _updateDatabaseField() {
+  //   userProfileData.updateUserData(Map());
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ class HomePage extends StatelessWidget {
               height: 75,
               child: ElevatedButton(
                   onPressed: () {
-                    _readFromDatabase();
+                    // _readFromDatabase();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -96,7 +96,7 @@ class HomePage extends StatelessWidget {
               height: 75,
               child: ElevatedButton(
                   onPressed: () {
-                    _readFromDatabase();
+                    // _readFromDatabase();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
