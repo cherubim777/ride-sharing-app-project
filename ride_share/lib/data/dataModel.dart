@@ -1,41 +1,155 @@
-// import 'package:firebase_database/firebase_database.dart';
+import 'dart:convert';
 
-class DataModel {
-  DataModel(this.uid, this.email,
-      {this.userStatus = 'offline',
-      this.userName = '',
-      this.phoneNumber = '',
-      this.currentLocation = '',
-      this.destinationLocation = '',
-      this.userType = ''});
+RideShare rideShareFromJson(String str) => RideShare.fromJson(json.decode(str));
 
-  DataModel.fromJson(Map<dynamic, dynamic> json)
-      : uid = json['Uid'] as String,
-        userName = json['UserName'] as String,
-        phoneNumber = json['PhoneNumber'] as String,
-        email = json['EmailAddress'] as String,
-        userType = json['UserStatus'] as String,
-        userStatus = json['UserStatus'] as String,
-        currentLocation = json['CurrentLocation'] as String,
-        destinationLocation = json['DestinationLocation'] as String;
+String rideShareToJson(RideShare data) => json.encode(data.toJson());
 
-  Map<dynamic, dynamic> toJson() => <dynamic, dynamic>{
-        'Uid': uid,
-        'UserName': userName,
-        'PhoneNumber': phoneNumber,
-        'EmailAddress': email,
-        'UserType': userType,
-        'UserStatus': userStatus,
-        'CurrentLocation': currentLocation,
-        'DestinationLocation': destinationLocation
+class RideShare {
+  RideShare({
+    this.ride,
+    this.rideMembers,
+    this.users,
+  });
+
+  Ride? ride;
+  RideMembers? rideMembers;
+  Users? users;
+
+  factory RideShare.fromJson(Map<String, dynamic> json) => RideShare(
+        ride: json["ride"] == null ? null : Ride.fromJson(json["ride"]),
+        rideMembers: json["rideMembers"] == null
+            ? null
+            : RideMembers.fromJson(json["rideMembers"]),
+        users: json["users"] == null ? null : Users.fromJson(json["users"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "ride": ride?.toJson(),
+        "rideMembers": rideMembers?.toJson(),
+        "users": users?.toJson(),
       };
+}
 
-  late String uid;
-  late String userName;
-  late String phoneNumber;
-  late String email;
-  late String userType;
-  late String userStatus;
-  late String currentLocation;
-  late String destinationLocation;
+class Ride {
+  Ride({
+    this.creator,
+    this.location,
+    this.seats,
+  });
+
+  String? creator;
+  Location? location;
+  int? seats;
+
+  factory Ride.fromJson(Map<String, dynamic> json) => Ride(
+        creator: json["Creator"],
+        location: json["location"] == null
+            ? null
+            : Location.fromJson(json["location"]),
+        seats: json["seats"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "Creator": creator,
+        "location": location?.toJson(),
+        "seats": seats,
+      };
+}
+
+class Location {
+  Location({
+    this.currentLocation,
+    this.destinationLocation,
+  });
+
+  Coordinates? currentLocation;
+  Coordinates? destinationLocation;
+
+  factory Location.fromJson(Map<String, dynamic> json) => Location(
+        currentLocation: json["CurrentLocation"] == null
+            ? null
+            : Coordinates.fromJson(json["CurrentLocation"]),
+        destinationLocation: json["DestinationLocation"] == null
+            ? null
+            : Coordinates.fromJson(json["DestinationLocation"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "CurrentLocation": currentLocation?.toJson(),
+        "DestinationLocation": destinationLocation?.toJson(),
+      };
+}
+
+class Coordinates {
+  Coordinates({
+    this.latitude,
+    this.longitude,
+  });
+
+  double? latitude;
+  double? longitude;
+
+  factory Coordinates.fromJson(Map<String, dynamic> json) => Coordinates(
+        latitude: json["latitude"]?.toDouble(),
+        longitude: json["longitude"]?.toDouble(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "latitude": latitude,
+        "longitude": longitude,
+      };
+}
+
+class RideMembers {
+  RideMembers({
+    this.rideCreator,
+  });
+
+  String? rideCreator;
+
+  factory RideMembers.fromJson(Map<String, dynamic> json) => RideMembers(
+        rideCreator: json["rideCreator"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "rideCreator": rideCreator,
+      };
+}
+
+class Users {
+  Users({
+    this.uid,
+    this.emailAddress,
+    this.userName,
+    this.phoneNumber,
+    this.userType,
+    this.location,
+  });
+
+  String? uid;
+  String? emailAddress;
+  String? userName;
+  String? phoneNumber;
+  String? userType;
+  Location? location;
+
+  factory Users.fromJson(Map<String, dynamic> json) => Users(
+        uid: json["Uid"],
+        emailAddress: json["EmailAddress"],
+        userName: json["UserName"],
+        phoneNumber: json["PhoneNumber"],
+        userType: json["UserType"],
+        location: json["location"] == null
+            ? null
+            : Location.fromJson(json["location"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "Uid": uid,
+        "EmailAddress": emailAddress,
+        "UserName": userName,
+        "PhoneNumber": phoneNumber,
+        "UserType": userType,
+        "location": location?.toJson(),
+      };
 }

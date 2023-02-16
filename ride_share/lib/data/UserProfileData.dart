@@ -7,7 +7,7 @@ import 'package:ride_share/data/dataModel.dart';
 
 class UserProfileData {
   FirebaseDatabase database = FirebaseDatabase.instance;
-  Set<DataModel> users = {};
+  // Set<DataModel> users = {};
 
   readData(String request) async {
     DatabaseReference _userRequest = database.ref('UserProfile');
@@ -25,8 +25,8 @@ class UserProfileData {
     } catch (e) {
       print('userData Map -------------$e');
     }
-    print('this is all user data ====> $users');
-    users.clear();
+    // print('this is all user data ====> $users');
+    // users.clear();
   }
 
   readSingleUserData(String request) async {
@@ -39,8 +39,8 @@ class UserProfileData {
         for (final child in _profile) {
           userData[child.key.toString()] = child.value;
         }
-        final currentUser = DataModel.fromJson(userData);
-        users.add(currentUser);
+        // final currentUser = DataModel.fromJson(userData);
+        // users.add(currentUser);
         // print(userData);
         print("reReading.....");
         // print(currentUser.email);

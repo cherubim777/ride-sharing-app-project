@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ride_share/auth.dart';
 import 'package:ride_share/data/dataModel.dart';
-import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/data/data_access_object.dart';
 import 'package:ride_share/pages/creator_page.dart';
 import 'package:ride_share/pages/joiner_page.dart';
 
@@ -29,14 +29,14 @@ class HomePage extends StatelessWidget {
     });
   }
 
-  _readFromDatabase() {
-    final User? user = Auth().currentUser;
-    // String? _data;
-    if (user != null) {
-      final currentUser = user.uid;
-      var _data = userProfileData.readData('UserProfile');
-    }
-  }
+  // _readFromDatabase() {
+  //   final User? user = Auth().currentUser;
+  //   // String? _data;
+  //   if (user != null) {
+  //     final currentUser = user.uid;
+  //     var _data = userProfileData.readData('UserProfile');
+  //   }
+  // }
 
   Future<void> signOut() async {
     await Auth().signOut();
@@ -63,9 +63,9 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  _updateDatabaseField() {
-    userProfileData.updateUserData(_controllerLocation.text);
-  }
+  // _updateDatabaseField() {
+  //   userProfileData.updateUserData(Map());
+  // }
 
   @override
   Widget build(BuildContext context) {
