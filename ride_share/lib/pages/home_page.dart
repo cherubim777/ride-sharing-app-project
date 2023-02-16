@@ -12,16 +12,16 @@ class HomePage extends StatelessWidget {
 
   final User? user = Auth().currentUser;
   final database = FirebaseDatabase.instance;
-  var userProfileData = UserProfileData();
+  var userProfileData = DataAccessObject();
   final CreatorPage creatorUser = CreatorPage();
 
   void _registerIntoDatabase(String type) {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData = DataModel(
-          user.uid.toString(),
-          user.email.toString(),
+        final currentProfileData = Users(
+          uid: user.uid.toString(),
+          emailAddress: user.email.toString(),
           userType: type,
         );
         userProfileData.registerUser(currentProfileData);

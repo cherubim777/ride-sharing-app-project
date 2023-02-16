@@ -59,12 +59,11 @@ class _CreatorPageState extends State<CreatorPage> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData = DataModel(
-          user.uid.toString(),
-          user.email.toString(),
-          currentLocation: startingPoint.toString(),
-          destinationLocation: destinationPoint.toString(),
-          userStatus: status,
+        final currentProfileData = Users(
+          uid: user.uid.toString(),
+          emailAddress: user.email.toString(),
+          // currentLocation: startingPoint.toString(),
+          // destinationLocation: destinationPoint.toString(),
         );
         this.user.registerUser(currentProfileData);
       }
