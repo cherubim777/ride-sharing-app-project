@@ -16,10 +16,11 @@ class CreatorPage extends StatefulWidget {
 
 class _CreatorPageState extends State<CreatorPage> {
   UserProfileData user = UserProfileData();
-  MyMap creatorMap = MyMap();
+  CreatorMap creatorMap = CreatorMap();
 
   int numberOfAvailableSeats = 0;
 
+  @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -46,27 +47,6 @@ class _CreatorPageState extends State<CreatorPage> {
         this.user.registerUser(currentProfileData);
       }
     });
-  }
-
-  Future<List<String>> fetchSuggestions(String input) async {
-    List<String> suggestions = [];
-    try {
-      List<SearchInfo> suggestionsInfo =
-          await addressSuggestion(input, limitInformation: 10);
-      if (suggestionsInfo.isEmpty) {
-        return [];
-      }
-      for (var info in suggestionsInfo) {
-        if (info.address?.country == "ኢትዮጵያ") {
-          print(info.address?.country);
-          suggestions.add(info.address.toString());
-        }
-      }
-    } catch (error) {
-      return [];
-    }
-
-    return suggestions;
   }
 
   Future<GeoPoint> getPointFromAddress(String address) async {
@@ -181,7 +161,9 @@ class _CreatorPageState extends State<CreatorPage> {
             heroTag: null,
             child: const Icon(Icons.add),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(
+            height: 10,
+          ),
           FloatingActionButton(
             onPressed: (() => creatorMap.controller.zoomIn()),
             heroTag: null,
@@ -224,7 +206,8 @@ class _CreatorPageState extends State<CreatorPage> {
             return const Iterable<String>.empty();
           }
         } else {
-          List<String> sug = await fetchSuggestions(textEditingValue.text);
+          List<String> sug =
+              await creatorMap.fetchSuggestions(textEditingValue.text);
 
           return sug.where((word) =>
               word.toLowerCase().contains(textEditingValue.text.toLowerCase()));
@@ -256,11 +239,13 @@ class _CreatorPageState extends State<CreatorPage> {
                     creatorMap.controller.setMarkerIcon(
                       current,
                       MarkerIcon(
-                        icon: Icon(Icons.place,
-                            color: hintText == "Starting Location"
-                                ? Colors.red[900]
-                                : Colors.blue[900],
-                            size: 100),
+                        icon: Icon(
+                          Icons.place,
+                          color: hintText == "Starting Location"
+                              ? Colors.red[900]
+                              : Colors.blue[900],
+                          size: 100,
+                        ),
                       ),
                     );
                   },

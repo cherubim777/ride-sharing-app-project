@@ -13,7 +13,7 @@ class HomePage extends StatelessWidget {
   final User? user = Auth().currentUser;
   final database = FirebaseDatabase.instance;
   var userProfileData = UserProfileData();
-  final CreatorPage creatorUser = CreatorPage();
+  final CreatorPage creatorUser = const CreatorPage();
 
   void _registerIntoDatabase(String type) {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
