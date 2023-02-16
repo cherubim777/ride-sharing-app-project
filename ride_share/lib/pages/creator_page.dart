@@ -65,7 +65,7 @@ class _CreatorPageState extends State<CreatorPage> {
       return await creatorMap.controller.myLocation();
     }
     List<SearchInfo> suggestionsInfo =
-        await addressSuggestion(address, limitInformation: 10);
+        await addressSuggestion(address, limitInformation: 2);
     return suggestionsInfo[0].point!;
   }
 

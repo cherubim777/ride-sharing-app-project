@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+// import 'package:ride_share/data/data_access_object.dart';
 
 class MyMap {
   late GeoPoint currentLocation;
+  // late DataAccessObject dataAccessObject;
 
   MapController controller = MapController(
     initMapWithUserPosition: false,
@@ -96,11 +98,11 @@ class CreatorMap extends MyMap {
   GeoPoint? destinationPoint;
   int passengersJoined = 0;
   List<GeoPoint> joiners = [
-    GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
-    GeoPoint(latitude: 9.036000, longitude: 38.763039), // Romina
-    GeoPoint(latitude: 9.030251, longitude: 38.763458), // Abrehot Library
-    GeoPoint(latitude: 9.038204, longitude: 38.763609), // Burte
-    GeoPoint(latitude: 9.033495, longitude: 38.763833), // NBH complex
+    // GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
+    // GeoPoint(latitude: 9.036000, longitude: 38.763039), // Romina
+    // GeoPoint(latitude: 9.030251, longitude: 38.763458), // Abrehot Library
+    // GeoPoint(latitude: 9.038204, longitude: 38.763609), // Burte
+    // GeoPoint(latitude: 9.033495, longitude: 38.763833), // NBH complex
   ];
 
   List<GeoPoint> joined = [];

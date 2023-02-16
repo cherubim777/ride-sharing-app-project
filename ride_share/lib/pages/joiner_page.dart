@@ -15,12 +15,6 @@ class JoinerPage extends StatefulWidget {
 }
 
 class _JoinerPageState extends State<JoinerPage> {
-  // GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
-  // GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
-
-  // GeoPoint? startingPoint;
-  // GeoPoint? destinationPoint;
-
   DataAccessObject user = DataAccessObject();
   JoinerMap joinerMap = JoinerMap();
 
@@ -68,7 +62,7 @@ class _JoinerPageState extends State<JoinerPage> {
       return await joinerMap.controller.myLocation();
     }
     List<SearchInfo> suggestionsInfo =
-        await addressSuggestion(address, limitInformation: 10);
+        await addressSuggestion(address, limitInformation: 2);
     return suggestionsInfo[0].point!;
   }
 

@@ -106,35 +106,40 @@ class RideMembers {
   RideMembers({
     this.rideCreator,
     this.joiner1,
-    this.joiner2,
-    this.joiner3,
-    this.joiner4,
-    this.joiner5,
+    // this.joiner2,
+    // this.joiner3,
+    // this.joiner4,
+    // this.joiner5,
   });
 
   String? rideCreator;
   String? joiner1;
-  String? joiner2;
-  String? joiner3;
-  String? joiner4;
-  String? joiner5;
+  // Location? joiner2;
+  // Location? joiner3;
+  // Location? joiner4;
+  // Location? joiner5;
 
   factory RideMembers.fromJson(Map<String, dynamic> json) => RideMembers(
         rideCreator: json["rideCreator"],
         joiner1: json["joiner1"],
-        joiner2: json["joiner2"],
-        joiner3: json["joiner3"],
-        joiner4: json["joiner4"],
-        joiner5: json["joiner5"],
+        // json["joiner1"] == null ? null : Users.fromJson(json["joiner1"]),
+        // joiner2:
+        //     json["joiner2"] == null ? null : Location.fromJson(json["joiner2"]),
+        // joiner3:
+        //     json["joiner3"] == null ? null : Location.fromJson(json["joiner3"]),
+        // joiner4:
+        //     json["joiner4"] == null ? null : Location.fromJson(json["joiner4"]),
+        // joiner5:
+        //     json["joiner5"] == null ? null : Location.fromJson(json["joiner5"]),
       );
 
   Map<String, dynamic> toJson() => {
         "rideCreator": rideCreator,
         "joiner1": joiner1,
-        "joiner2": joiner2,
-        "joiner3": joiner3,
-        "joiner4": joiner4,
-        "joiner5": joiner5,
+        // "joiner2": joiner2?.toJson(),
+        // "joiner3": joiner3?.toJson(),
+        // "joiner4": joiner4?.toJson(),
+        // "joiner5": joiner5?.toJson(),
       };
 }
 
