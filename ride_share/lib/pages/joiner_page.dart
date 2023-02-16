@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
+import 'package:ride_share/Map/map.dart';
 import 'package:ride_share/data/UserProfileData.dart';
 import 'package:ride_share/data/dataModel.dart';
 
@@ -20,19 +20,9 @@ class _JoinerPageState extends State<JoinerPage> {
 
   GeoPoint? startingPoint;
   GeoPoint? destinationPoint;
-  GeoPoint? creatorPoint;
-  UserProfileData user = UserProfileData();
 
-  MapController controller = MapController(
-    initMapWithUserPosition: false,
-    initPosition: GeoPoint(latitude: 9.005401, longitude: 38.763611),
-    areaLimit: BoundingBox(
-      east: 15.0,
-      north: 47.738,
-      south: 33.017,
-      west: 3.233,
-    ),
-  );
+  UserProfileData user = UserProfileData();
+  var joinerMap = JoinerMap();
 
   @override
   void initState() {
@@ -42,7 +32,7 @@ class _JoinerPageState extends State<JoinerPage> {
 
   @override
   void dispose() {
-    controller.dispose();
+    joinerMap.controller.dispose();
     super.dispose();
   }
 
@@ -61,27 +51,9 @@ class _JoinerPageState extends State<JoinerPage> {
     });
   }
 
-  Future<List<String>> fetchSuggestions(String input) async {
-    List<String> suggestions = [];
-    try {
-      List<SearchInfo> suggestionsInfo =
-          await addressSuggestion(input, limitInformation: 10);
-      if (suggestionsInfo.isEmpty) {
-        return [];
-      }
-      for (var info in suggestionsInfo) {
-        suggestions.add(info.address.toString());
-      }
-    } catch (error) {
-      return [];
-    }
-
-    return suggestions;
-  }
-
   Future<GeoPoint> getPointFromAddress(String address) async {
     if (address == "Your Location") {
-      return await controller.myLocation();
+      return await joinerMap.controller.myLocation();
     }
     List<SearchInfo> suggestionsInfo =
         await addressSuggestion(address, limitInformation: 2);
@@ -94,7 +66,7 @@ class _JoinerPageState extends State<JoinerPage> {
       body: Stack(
         children: [
           OSMFlutter(
-            controller: controller,
+            controller: joinerMap.controller,
             showZoomController: true,
             androidHotReloadSupport: true,
             initZoom: 11,
@@ -144,8 +116,8 @@ class _JoinerPageState extends State<JoinerPage> {
                     if (textEditingValue.text.isEmpty) {
                       return const Iterable<String>.empty();
                     } else {
-                      List<String> sug =
-                          await fetchSuggestions(textEditingValue.text);
+                      List<String> sug = await joinerMap
+                          .fetchSuggestions(textEditingValue.text);
 
                       return sug.where((word) => word
                           .toLowerCase()
@@ -167,16 +139,17 @@ class _JoinerPageState extends State<JoinerPage> {
                                 GeoPoint current = await getPointFromAddress(
                                     textEditingController.text);
 
-                                startingPoint = await controller.myLocation();
+                                startingPoint =
+                                    await joinerMap.controller.myLocation();
                                 destinationPoint = current;
 
                                 if (startingPoint != null) {
-                                  controller.setStaticPosition(
+                                  joinerMap.controller.setStaticPosition(
                                       [startingPoint!], "location");
                                   if (destinationPoint != null) {
-                                    controller.setStaticPosition(
+                                    joinerMap.controller.setStaticPosition(
                                         [destinationPoint!], "destination");
-                                    controller.setMarkerOfStaticPoint(
+                                    joinerMap.controller.setMarkerOfStaticPoint(
                                       id: "destination",
                                       markerIcon: MarkerIcon(
                                         icon: Icon(
@@ -210,7 +183,7 @@ class _JoinerPageState extends State<JoinerPage> {
         children: [
           FloatingActionButton(
             onPressed: () {
-              controller.zoomIn();
+              joinerMap.controller.zoomIn();
             },
             heroTag: null,
             child: const Icon(Icons.zoom_in),
@@ -220,7 +193,7 @@ class _JoinerPageState extends State<JoinerPage> {
           ),
           FloatingActionButton(
             onPressed: () {
-              controller.zoomOut();
+              joinerMap.controller.zoomOut();
             },
             heroTag: null,
             child: const Icon(Icons.zoom_out),
@@ -230,13 +203,14 @@ class _JoinerPageState extends State<JoinerPage> {
           ),
           FloatingActionButton(
             onPressed: () async {
-              creatorPoint = GeoPoint(latitude: 9.04083, longitude: 38.76194);
+              joinerMap.creatorPoint =
+                  GeoPoint(latitude: 9.04083, longitude: 38.76194);
 
-              if (creatorPoint != null) {
-                controller.setStaticPosition([
-                  creatorPoint!,
+              if (joinerMap.creatorPoint != null) {
+                joinerMap.controller.setStaticPosition([
+                  joinerMap.creatorPoint!,
                 ], "creator");
-                controller.setMarkerOfStaticPoint(
+                joinerMap.controller.setMarkerOfStaticPoint(
                   id: "creator",
                   markerIcon: MarkerIcon(
                     icon: Icon(
@@ -248,15 +222,15 @@ class _JoinerPageState extends State<JoinerPage> {
                 );
                 if (startingPoint != null &&
                     destinationPoint != null &&
-                    startingPoint != creatorPoint) {
-                  controller.zoomToBoundingBox(
+                    startingPoint != joinerMap.creatorPoint) {
+                  joinerMap.controller.zoomToBoundingBox(
                       BoundingBox.fromGeoPoints(
-                          [startingPoint!, creatorPoint!]),
+                          [startingPoint!, joinerMap.creatorPoint!]),
                       paddinInPixel: 350);
 
-                  RoadInfo roadInfo = await controller.drawRoad(
+                  RoadInfo roadInfo = await joinerMap.controller.drawRoad(
                     startingPoint!,
-                    creatorPoint!,
+                    joinerMap.creatorPoint!,
                     roadType: RoadType.car,
                     roadOption: RoadOption(
                       roadWidth: 20,
@@ -275,10 +249,7 @@ class _JoinerPageState extends State<JoinerPage> {
             height: 10,
           ),
           FloatingActionButton(
-            onPressed: () async {
-              await controller.currentLocation();
-              controller.zoomIn();
-            },
+            onPressed: joinerMap.goToMyLocation,
             heroTag: null,
             child: const Icon(Icons.my_location),
           ),
