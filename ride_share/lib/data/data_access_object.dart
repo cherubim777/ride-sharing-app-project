@@ -75,6 +75,7 @@ class DataAccessObject {
                 .child('RideShare/Users/${child.value}/CurrentLocation')
                 .onValue
                 .listen((event) {
+              print('---->-->${event.snapshot.children.first}<---<---');
               GeoPoint point = GeoPoint(
                 latitude:
                     double.parse(event.snapshot.children.first.toString()),
@@ -82,7 +83,7 @@ class DataAccessObject {
                     double.parse(event.snapshot.children.last.toString()),
               );
               joinersLocation.add(point);
-              print('------>${point}<------');
+              print('------>$point<------');
             });
           }
         });
