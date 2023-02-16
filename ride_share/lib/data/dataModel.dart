@@ -41,13 +41,15 @@ class Ride {
   Location? location;
   int? seats;
 
-  factory Ride.fromJson(Map<String, dynamic> json) => Ride(
+  factory Ride.fromJson(json) => Ride(
         creator: json["Creator"],
         location: json["location"] == null
             ? null
             : Location.fromJson(json["location"]),
         seats: json["seats"],
       );
+
+  get uid => null;
 
   Map<String, dynamic> toJson() => {
         "Creator": creator,
@@ -65,7 +67,7 @@ class Location {
   Coordinates? currentLocation;
   Coordinates? destinationLocation;
 
-  factory Location.fromJson(Map<String, dynamic> json) => Location(
+  factory Location.fromJson(json) => Location(
         currentLocation: json["CurrentLocation"] == null
             ? null
             : Coordinates.fromJson(json["CurrentLocation"]),
@@ -89,7 +91,7 @@ class Coordinates {
   double? latitude;
   double? longitude;
 
-  factory Coordinates.fromJson(Map<String, dynamic> json) => Coordinates(
+  factory Coordinates.fromJson(json) => Coordinates(
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
       );
@@ -103,16 +105,36 @@ class Coordinates {
 class RideMembers {
   RideMembers({
     this.rideCreator,
+    this.joiner1,
+    this.joiner2,
+    this.joiner3,
+    this.joiner4,
+    this.joiner5,
   });
 
   String? rideCreator;
+  String? joiner1;
+  String? joiner2;
+  String? joiner3;
+  String? joiner4;
+  String? joiner5;
 
   factory RideMembers.fromJson(Map<String, dynamic> json) => RideMembers(
         rideCreator: json["rideCreator"],
+        joiner1: json["joiner1"],
+        joiner2: json["joiner2"],
+        joiner3: json["joiner3"],
+        joiner4: json["joiner4"],
+        joiner5: json["joiner5"],
       );
 
   Map<String, dynamic> toJson() => {
         "rideCreator": rideCreator,
+        "joiner1": joiner1,
+        "joiner2": joiner2,
+        "joiner3": joiner3,
+        "joiner4": joiner4,
+        "joiner5": joiner5,
       };
 }
 

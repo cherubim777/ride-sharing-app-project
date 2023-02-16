@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:ride_share/Map/map.dart';
-import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/data/data_access_object.dart';
 import 'package:ride_share/data/dataModel.dart';
 
 class JoinerPage extends StatefulWidget {
-  JoinerPage({super.key});
+  const JoinerPage({super.key});
 
   @override
   State<JoinerPage> createState() => _JoinerPageState();
@@ -18,11 +18,11 @@ class _JoinerPageState extends State<JoinerPage> {
   // GeoPoint startingPoint = GeoPoint(latitude: 0, longitude: 0);
   // GeoPoint destinationPoint = GeoPoint(latitude: 0, longitude: 0);
 
-  GeoPoint? startingPoint;
-  GeoPoint? destinationPoint;
+  // GeoPoint? startingPoint;
+  // GeoPoint? destinationPoint;
 
-  UserProfileData user = UserProfileData();
-  var joinerMap = JoinerMap();
+  DataAccessObject user = DataAccessObject();
+  JoinerMap joinerMap = JoinerMap();
 
   @override
   void initState() {
@@ -40,13 +40,25 @@ class _JoinerPageState extends State<JoinerPage> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData = Users(
-          uid: user.uid.toString(),
-          emailAddress: user.email.toString(),
-          // currentLocation: startingPoint.toString(),
-          // destinationLocation: destinationPoint.toString(),
+        final joinerLocation = Location(
+          currentLocation: Coordinates(
+            latitude: joinerMap.startingPoint?.latitude,
+            longitude: joinerMap.startingPoint?.longitude,
+          ),
+          destinationLocation: Coordinates(
+            latitude: joinerMap.destinationPoint?.latitude,
+            longitude: joinerMap.destinationPoint?.longitude,
+          ),
         );
-        this.user.registerUser(currentProfileData);
+        this.user.updateUserData(joinerLocation.toJson());
+      }
+    });
+  }
+
+  void joinGroup() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        this.user.joinRideGroup();
       }
     });
   }
@@ -56,7 +68,7 @@ class _JoinerPageState extends State<JoinerPage> {
       return await joinerMap.controller.myLocation();
     }
     List<SearchInfo> suggestionsInfo =
-        await addressSuggestion(address, limitInformation: 2);
+        await addressSuggestion(address, limitInformation: 10);
     return suggestionsInfo[0].point!;
   }
 
@@ -136,19 +148,22 @@ class _JoinerPageState extends State<JoinerPage> {
                               onPressed: () async {
                                 FocusManager.instance.primaryFocus?.unfocus();
 
-                                GeoPoint current = await getPointFromAddress(
+                                GeoPoint userInput = await getPointFromAddress(
                                     textEditingController.text);
 
-                                startingPoint =
+                                joinerMap.startingPoint =
                                     await joinerMap.controller.myLocation();
-                                destinationPoint = current;
+                                joinerMap.destinationPoint = userInput;
 
-                                if (startingPoint != null) {
+                                _registerIntoDatabase();
+                                joinGroup();
+                                if (joinerMap.startingPoint != null) {
                                   joinerMap.controller.setStaticPosition(
-                                      [startingPoint!], "location");
-                                  if (destinationPoint != null) {
+                                      [joinerMap.startingPoint!], "location");
+                                  if (joinerMap.destinationPoint != null) {
                                     joinerMap.controller.setStaticPosition(
-                                        [destinationPoint!], "destination");
+                                        [joinerMap.destinationPoint!],
+                                        "destination");
                                     joinerMap.controller.setMarkerOfStaticPoint(
                                       id: "destination",
                                       markerIcon: MarkerIcon(
@@ -220,16 +235,16 @@ class _JoinerPageState extends State<JoinerPage> {
                     ),
                   ),
                 );
-                if (startingPoint != null &&
-                    destinationPoint != null &&
-                    startingPoint != joinerMap.creatorPoint) {
+                if (joinerMap.startingPoint != null &&
+                    joinerMap.destinationPoint != null &&
+                    joinerMap.startingPoint != joinerMap.creatorPoint) {
                   joinerMap.controller.zoomToBoundingBox(
                       BoundingBox.fromGeoPoints(
-                          [startingPoint!, joinerMap.creatorPoint!]),
+                          [joinerMap.startingPoint!, joinerMap.creatorPoint!]),
                       paddinInPixel: 350);
 
                   RoadInfo roadInfo = await joinerMap.controller.drawRoad(
-                    startingPoint!,
+                    joinerMap.startingPoint!,
                     joinerMap.creatorPoint!,
                     roadType: RoadType.car,
                     roadOption: RoadOption(

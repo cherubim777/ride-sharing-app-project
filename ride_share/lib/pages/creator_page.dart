@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:ride_share/Map/map.dart';
-import 'package:ride_share/data/UserProfileData.dart';
+import 'package:ride_share/data/data_access_object.dart';
 import 'package:ride_share/data/dataModel.dart';
 
 class CreatorPage extends StatefulWidget {
@@ -15,7 +15,7 @@ class CreatorPage extends StatefulWidget {
 }
 
 class _CreatorPageState extends State<CreatorPage> {
-  UserProfileData user = UserProfileData();
+  DataAccessObject user = DataAccessObject();
   CreatorMap creatorMap = CreatorMap();
 
   int numberOfAvailableSeats = 0;
@@ -29,21 +29,33 @@ class _CreatorPageState extends State<CreatorPage> {
   @override
   void dispose() {
     creatorMap.controller.dispose();
-    _registerIntoDatabase(status: "offline");
+    // _registerIntoDatabase();
     super.dispose();
   }
 
-  void _registerIntoDatabase({String status = "offline"}) {
+  void _registerIntoDatabase() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         // String current = user.uid.toString();
-        final currentProfileData = Users(
-          uid: user.uid.toString(),
-          emailAddress: user.email.toString(),
-          // currentLocation: startingPoint.toString(),
-          // destinationLocation: destinationPoint.toString(),
+        final creatorLocation = Location(
+          currentLocation: Coordinates(
+            latitude: creatorMap.startingPoint?.latitude,
+            longitude: creatorMap.startingPoint?.longitude,
+          ),
+          destinationLocation: Coordinates(
+            latitude: creatorMap.destinationPoint?.latitude,
+            longitude: creatorMap.destinationPoint?.longitude,
+          ),
         );
-        this.user.registerUser(currentProfileData);
+        final ride = Ride(
+          creator: user.uid,
+          location: creatorLocation,
+          seats: numberOfAvailableSeats,
+        );
+        final rideGroup = RideMembers(rideCreator: user.uid);
+        this.user.updateUserData(creatorLocation.toJson());
+        this.user.createRide(ride);
+        this.user.createRideGroup(rideGroup);
       }
     });
   }
@@ -53,7 +65,7 @@ class _CreatorPageState extends State<CreatorPage> {
       return await creatorMap.controller.myLocation();
     }
     List<SearchInfo> suggestionsInfo =
-        await addressSuggestion(address, limitInformation: 2);
+        await addressSuggestion(address, limitInformation: 10);
     return suggestionsInfo[0].point!;
   }
 
@@ -99,7 +111,7 @@ class _CreatorPageState extends State<CreatorPage> {
                     textController.text = "5";
                   } else {
                     numberOfAvailableSeats = input;
-                    _registerIntoDatabase(status: "online");
+                    _registerIntoDatabase();
                     Navigator.of(context).pop();
 
                     if (creatorMap.startingPoint != null &&
@@ -225,18 +237,18 @@ class _CreatorPageState extends State<CreatorPage> {
                   : const Icon(Icons.local_taxi),
               suffix: IconButton(
                   onPressed: () async {
-                    GeoPoint current =
+                    GeoPoint userInput =
                         await getPointFromAddress(textEditingController.text);
-                    creatorMap.controller.removeMarker(current);
+                    creatorMap.controller.removeMarker(userInput);
 
                     hintText == "Starting Location"
-                        ? creatorMap.startingPoint = current
-                        : creatorMap.destinationPoint = current;
+                        ? creatorMap.startingPoint = userInput
+                        : creatorMap.destinationPoint = userInput;
                     _registerIntoDatabase();
-                    creatorMap.controller.removeMarker(current);
-                    creatorMap.controller.changeLocation(current);
+                    creatorMap.controller.removeMarker(userInput);
+                    creatorMap.controller.changeLocation(userInput);
                     creatorMap.controller.setMarkerIcon(
-                      current,
+                      userInput,
                       MarkerIcon(
                         icon: Icon(
                           Icons.place,

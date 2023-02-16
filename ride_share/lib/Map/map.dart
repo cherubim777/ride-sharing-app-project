@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 
 class MyMap {
-  GeoPoint? startingPoint;
-  GeoPoint? destinationPoint;
   late GeoPoint currentLocation;
 
   MapController controller = MapController(
@@ -94,6 +92,8 @@ class MyMap {
 }
 
 class CreatorMap extends MyMap {
+  GeoPoint? startingPoint;
+  GeoPoint? destinationPoint;
   int passengersJoined = 0;
   List<GeoPoint> joiners = [
     GeoPoint(latitude: 9.028622, longitude: 38.763225), // Friendship park
@@ -132,4 +132,6 @@ class CreatorMap extends MyMap {
 
 class JoinerMap extends MyMap {
   GeoPoint? creatorPoint;
+  GeoPoint? startingPoint;
+  GeoPoint? destinationPoint;
 }
