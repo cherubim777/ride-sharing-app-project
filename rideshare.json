@@ -1,0 +1,26 @@
+{
+    "ride": {
+        "Creator": "Uid",
+        "location": {
+            "CurrentLocation":"GeoPoint{latitude: 8.9569438 , longitude: 38.7242638}",
+            "DestinationLocation":"GeoPoint{latitude: 8.962086200000002 , longitude: 38.713399127641836}"
+        },
+        "seats": "4"
+    },
+    
+    "rideMembers": {
+        "rideCreator": "Uid"
+    },
+
+    "users": {
+        "Uid": "skFNkDNPYsXf4sQ3MWwdjTZUWwM2",
+        "EmailAddress": "nahom@gmail.com",
+        "UserName": "",
+        "PhoneNumber": "",
+        "UserType": "Joiner",
+        "location": {
+            "CurrentLocation": "GeoPoint{latitude: 8.9569438 , longitude: 38.7242638}",
+            "DestinationLocation": "GeoPoint{latitude: 8.962086200000002 , longitude: 38.713399127641836}"
+        }
+    }
+}
