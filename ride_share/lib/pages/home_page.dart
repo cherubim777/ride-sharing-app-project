@@ -31,15 +31,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // _readFromDatabase() {
-  //   final User? user = Auth().currentUser;
-  //   // String? _data;
-  //   if (user != null) {
-  //     final currentUser = user.uid;
-  //     var _data = userProfileData.readData('UserProfile');
-  //   }
-  // }
-
   Future<void> signOut() async {
     await Auth().signOut();
   }
@@ -64,10 +55,6 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-
-  // _updateDatabaseField() {
-  //   userProfileData.updateUserData(Map());
-  // }
 
   @override
   Widget build(BuildContext context) {

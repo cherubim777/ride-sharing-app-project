@@ -63,6 +63,9 @@ class _CreatorPageState extends State<CreatorPage> {
   Future<GeoPoint> getPointFromAddress(String address) async {
     if (address == "Your Location") {
       return await creatorMap.controller.myLocation();
+    } else if (address == "Mexico Square") {
+      return GeoPoint(
+          latitude: 9.01047614822204, longitude: 38.744379172396485);
     }
     List<SearchInfo> suggestionsInfo =
         await addressSuggestion(address, limitInformation: 2);
@@ -211,11 +214,11 @@ class _CreatorPageState extends State<CreatorPage> {
     return Autocomplete(
       optionsBuilder: (TextEditingValue textEditingValue) async {
         if (textEditingValue.text.isEmpty) {
-          // if (hintText == "Starting Location") {
-          return ["Your Location"];
-          // } else {
-          //   return const Iterable<String>.empty();
-          // }
+          if (hintText == "Starting Location") {
+            return ["Your Location"];
+          } else {
+            return ["Mexico Square"];
+          }
         } else {
           List<String> sug =
               await creatorMap.fetchSuggestions(textEditingValue.text);

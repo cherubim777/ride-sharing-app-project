@@ -62,10 +62,12 @@ class _JoinerPageState extends State<JoinerPage> {
   Future<GeoPoint> getPointFromAddress(String address) async {
     if (address == "Your Location") {
       return await joinerMap.controller.myLocation();
+    } else if (address == "Mexico Square") {
+      GeoPoint(latitude: 9.01047614822204, longitude: 38.744379172396485);
     }
-    // List<SearchInfo> suggestionsInfo =
-    // await addressSuggestion(address, limitInformation: 2);
-    return await joinerMap.controller.myLocation();
+    List<SearchInfo> suggestionsInfo =
+        await addressSuggestion(address, limitInformation: 2);
+    return suggestionsInfo[0].point!;
   }
 
   @override
@@ -122,7 +124,7 @@ class _JoinerPageState extends State<JoinerPage> {
                 Autocomplete(
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
-                      return ["Dest Location"];
+                      return ["Mexico Square"];
                       //   // return const Iterable<String>.empty();
                     } else {
                       List<String> sug = await joinerMap
