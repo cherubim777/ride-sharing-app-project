@@ -63,9 +63,9 @@ class _JoinerPageState extends State<JoinerPage> {
     if (address == "Your Location") {
       return await joinerMap.controller.myLocation();
     }
-    List<SearchInfo> suggestionsInfo =
-        await addressSuggestion(address, limitInformation: 2);
-    return suggestionsInfo[0].point!;
+    // List<SearchInfo> suggestionsInfo =
+    //     await addressSuggestion(address, limitInformation: 2);
+    return await joinerMap.controller.myLocation();
   }
 
   @override
@@ -122,7 +122,8 @@ class _JoinerPageState extends State<JoinerPage> {
                 Autocomplete(
                   optionsBuilder: (TextEditingValue textEditingValue) async {
                     if (textEditingValue.text.isEmpty) {
-                      return const Iterable<String>.empty();
+                      return ["Dest Location"];
+                      //   // return const Iterable<String>.empty();
                     } else {
                       List<String> sug = await joinerMap
                           .fetchSuggestions(textEditingValue.text);

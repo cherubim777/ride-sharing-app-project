@@ -211,11 +211,11 @@ class _CreatorPageState extends State<CreatorPage> {
     return Autocomplete(
       optionsBuilder: (TextEditingValue textEditingValue) async {
         if (textEditingValue.text.isEmpty) {
-          if (hintText == "Starting Location") {
-            return ["Your Location"];
-          } else {
-            return const Iterable<String>.empty();
-          }
+          // if (hintText == "Starting Location") {
+          return ["Your Location"];
+          // } else {
+          //   return const Iterable<String>.empty();
+          // }
         } else {
           List<String> sug =
               await creatorMap.fetchSuggestions(textEditingValue.text);
