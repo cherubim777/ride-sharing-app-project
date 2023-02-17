@@ -17,6 +17,7 @@ class JoinerPage extends StatefulWidget {
 class _JoinerPageState extends State<JoinerPage> {
   DataAccessObject user = DataAccessObject();
   JoinerMap joinerMap = JoinerMap();
+  Location joinerCurrentLocation = Location();
 
   @override
   void initState() {
@@ -45,6 +46,7 @@ class _JoinerPageState extends State<JoinerPage> {
           ),
         );
         this.user.updateUserData(joinerLocation.toJson());
+        joinerCurrentLocation = joinerLocation;
       }
     });
   }
@@ -52,7 +54,7 @@ class _JoinerPageState extends State<JoinerPage> {
   void joinGroup() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
-        this.user.joinRideGroup();
+        this.user.joinRideGroup(joinerCurrentLocation.toJson());
       }
     });
   }

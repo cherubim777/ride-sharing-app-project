@@ -104,42 +104,45 @@ class Coordinates {
 
 class RideMembers {
   RideMembers({
-    this.rideCreator,
     this.joiner1,
-    // this.joiner2,
-    // this.joiner3,
-    // this.joiner4,
-    // this.joiner5,
+    this.joiner2,
   });
 
-  String? rideCreator;
-  String? joiner1;
-  // Location? joiner2;
-  // Location? joiner3;
-  // Location? joiner4;
-  // Location? joiner5;
+  Joiner? joiner1;
+  Joiner? joiner2;
 
   factory RideMembers.fromJson(Map<String, dynamic> json) => RideMembers(
-        rideCreator: json["rideCreator"],
-        joiner1: json["joiner1"],
-        // json["joiner1"] == null ? null : Users.fromJson(json["joiner1"]),
-        // joiner2:
-        //     json["joiner2"] == null ? null : Location.fromJson(json["joiner2"]),
-        // joiner3:
-        //     json["joiner3"] == null ? null : Location.fromJson(json["joiner3"]),
-        // joiner4:
-        //     json["joiner4"] == null ? null : Location.fromJson(json["joiner4"]),
-        // joiner5:
-        //     json["joiner5"] == null ? null : Location.fromJson(json["joiner5"]),
+        joiner1:
+            json["joiner1"] == null ? null : Joiner.fromJson(json["joiner1"]),
+        joiner2:
+            json["joiner2"] == null ? null : Joiner.fromJson(json["joiner2"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "rideCreator": rideCreator,
-        "joiner1": joiner1,
-        // "joiner2": joiner2?.toJson(),
-        // "joiner3": joiner3?.toJson(),
-        // "joiner4": joiner4?.toJson(),
-        // "joiner5": joiner5?.toJson(),
+        "joiner1": joiner1?.toJson(),
+        "joiner2": joiner2?.toJson(),
+      };
+}
+
+class Joiner {
+  Joiner({
+    this.uid,
+    this.location,
+  });
+
+  String? uid;
+  Location? location;
+
+  factory Joiner.fromJson(Map<String, dynamic> json) => Joiner(
+        uid: json["uid"],
+        location: json["location"] == null
+            ? null
+            : Location.fromJson(json["location"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "uid": uid,
+        "location": location?.toJson(),
       };
 }
 
