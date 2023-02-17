@@ -145,9 +145,9 @@ class DataAccessObject {
             .update(group.toJson());
       });
 
-      print('\n\n\n\n\n');
-      getJoinedMembersLocation();
-      print('\n\n\n\n\n');
+      // print('\n\n\n\n\n');
+      // getJoinedMembersLocation();
+      // print('\n\n\n\n\n');
     }
   }
   // void updateRide(){

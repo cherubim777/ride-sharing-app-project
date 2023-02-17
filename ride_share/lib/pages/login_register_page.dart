@@ -104,6 +104,10 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         height: double.infinity,
         width: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/background.jpg"), fit: BoxFit.cover),
+        ),
         padding: const EdgeInsets.fromLTRB(50, 8, 50, 8),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

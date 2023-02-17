@@ -77,42 +77,50 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: _title(),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 200,
-              height: 75,
-              child: ElevatedButton(
-                  onPressed: () {
-                    _registerIntoDatabase('Creator');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreatorPage(),
-                      ),
-                    );
-                  },
-                  child: const Text('Create Ride')),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: 200,
-              height: 75,
-              child: ElevatedButton(
-                  onPressed: () {
-                    _registerIntoDatabase('Joiner');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => JoinerPage(),
-                      ),
-                    );
-                  },
-                  child: const Text('Join Ride')),
-            ),
-          ],
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/background.jpg"), fit: BoxFit.cover),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 200,
+                height: 75,
+                child: ElevatedButton(
+                    onPressed: () {
+                      _registerIntoDatabase('Creator');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreatorPage(),
+                        ),
+                      );
+                    },
+                    child: const Text('Create Ride')),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: 200,
+                height: 75,
+                child: ElevatedButton(
+                    onPressed: () {
+                      _registerIntoDatabase('Joiner');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JoinerPage(),
+                        ),
+                      );
+                    },
+                    child: const Text('Join Ride')),
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: _signOutButton(),
