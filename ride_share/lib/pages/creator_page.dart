@@ -52,10 +52,10 @@ class _CreatorPageState extends State<CreatorPage> {
           location: creatorLocation,
           seats: numberOfAvailableSeats,
         );
-        final rideGroup = RideMembers(rideCreator: user.uid);
+        // final rideGroup = RideMembers();
         this.user.updateUserData(creatorLocation.toJson());
         this.user.createRide(ride);
-        this.user.createRideGroup(rideGroup);
+        this.user.createRideGroup();
       }
     });
   }
