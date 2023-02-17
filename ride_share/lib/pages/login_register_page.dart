@@ -80,7 +80,13 @@ class _LoginPageState extends State<LoginPage> {
       onPressed: isLoggedIn
           ? signInWithEmailAndPassword
           : createUserWithEmailAndPassword,
-      child: Text(isLoggedIn ? "Login" : "Register"),
+      child: Text(
+        isLoggedIn ? "Login" : "Register",
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 
@@ -91,7 +97,13 @@ class _LoginPageState extends State<LoginPage> {
           isLoggedIn = !isLoggedIn;
         });
       },
-      child: Text(isLoggedIn ? "Register Instead" : "Login Instead"),
+      child: Text(
+        isLoggedIn ? "Register Instead" : "Login Instead",
+        style: TextStyle(
+          color: Colors.green[800],
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 
