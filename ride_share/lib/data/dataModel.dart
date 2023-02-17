@@ -133,7 +133,7 @@ class Joiner {
   String? uid;
   Location? location;
 
-  factory Joiner.fromJson(Map<String, dynamic> json) => Joiner(
+  factory Joiner.fromJson(json) => Joiner(
         uid: json["uid"],
         location: json["location"] == null
             ? null
