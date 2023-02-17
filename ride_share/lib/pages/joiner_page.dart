@@ -54,7 +54,7 @@ class _JoinerPageState extends State<JoinerPage> {
   void joinGroup() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
-        this.user.joinRideGroup(joinerCurrentLocation.toJson());
+        this.user.joinRideGroup(joinerCurrentLocation);
       }
     });
   }
@@ -64,7 +64,7 @@ class _JoinerPageState extends State<JoinerPage> {
       return await joinerMap.controller.myLocation();
     }
     // List<SearchInfo> suggestionsInfo =
-    //     await addressSuggestion(address, limitInformation: 2);
+    // await addressSuggestion(address, limitInformation: 2);
     return await joinerMap.controller.myLocation();
   }
 

@@ -60,18 +60,20 @@ class DataAccessObject {
           .onValue
           .listen((event) {
         for (var child in event.snapshot.children) {
-          var a = child.ref;
-          a.onValue.listen((event) {
-            for (var val in event.snapshot.children) {
-              if (val.key == 'location') {
-                locatioin.add(Location.fromJson(val.value));
-              }
-            }
-          });
+          locatioin.add(Joiner.fromJson(child.value));
+          // var a = child.ref;
+          // a.onValue.listen((event) {
+          //   for (var val in event.snapshot.children) {
+          //     if (val.key == 'location') {
+          //       locatioin.add(Location.fromJson(val.value));
+          //     }
+          //   }
+          // });
         }
       });
     }
-    print(locatioin);
+    print(
+        "\n\n\n\n===================================$locatioin==================================\n\n\n\n");
     return locatioin;
   }
 
